@@ -20,7 +20,8 @@ if(NOT TARGET ae2f::CoreScript)
 	add_subdirectory(${ae2f_CoreScript_Wh} ${ae2f_submod}/ae2f/CoreScript)
 endif()
 
-ae2f_CoreLibFetchX(ae2f Core main)
+ae2f_CoreLibFetchX(ae2f Core	main)
+ae2f_CoreLibFetchX(ae2f Preproc	main)
 
 find_package(LLVM CONFIG)
 if(LLVM_FOUND)
@@ -37,22 +38,27 @@ endif()
 file(GLOB aclspv-src ${PROJECT_SOURCE_DIR}/lib/*)
 file(GLOB aclspv-inc ${PROJECT_SOURCE_DIR}/inc/*)
 
+ae2f_Macro_init(1 30 30)
+ae2f_Macro_Lib_V(
+	ae3f aclspv INTERFACE
+	${PROJECT_SOURCE_DIR}/src/ "__NOTHING" 
+	${PROJECT_SOURCE_DIR}/src/ "*.def.c" 
+	${PROJECT_SOURCE_DIR}/lib/ ".auto.h"
+	${PROJECT_SOURCE_DIR}/cfg/aclspv.cmake.in
+	inc
+	)
+
+target_link_libraries(${ae3f__aclspv__TENT} INTERFACE
+	ae2f::Core ae2f::Preproc
+	)
+
 ae2f_CoreLibTentConfigCustom(
-	aclspv ${ae2f_LIBPREFIX}
-	inc ae3f ${PROJECT_SOURCE_DIR}/cfg/aclspv.cmake.in
+	aclspvABI ${ae2f_LIBPREFIX}
+	inc ae3f ${PROJECT_SOURCE_DIR}/cfg/aclspvABI.cmake.in
 	${aclspv-src} ${aclspv-inc}
 	)
 
-target_link_libraries(${ae3f__aclspv__TENT} PUBLIC ae2f::Core clang-c 	
-	LLVMAnalysis
-	LLVMCodeGen
-	LLVMCore
-	LLVMInstCombine
-	LLVMInstrumentation
-	LLVMObjCARCOpts
-	LLVMPasses
-	LLVMScalarOpts
-	LLVMSupport
-	LLVMTransformUtils
-	LLVMVectorize
-	LLVMipo)
+target_link_libraries(${ae3f__aclspvABI__TENT} PUBLIC ae3f::aclspv)
+
+add_executable(dummy main.c)
+target_link_libraries(dummy ae3f::aclspvABI)

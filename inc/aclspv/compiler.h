@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include "./abi.h"
 #include <clang-c/CXFile.h>
+#include <clang-c/Index.h>
 #include "./obj.h"
 
 /**
@@ -15,9 +16,17 @@
  * @todo	TODO: implement this
  * */
 typedef struct {
-	void* m_dummy;
+	/**
+	 * @var		mh_idx
+	 * @brief 	clang index
+	 * */
+	CXIndex	mh_idx;
 } x_aclspv_compiler;
 
+/**
+ * @class	h_aclspv_compiler_t
+ * @brief	handle for a compiler
+ * */
 typedef x_aclspv_compiler* ae2f_restrict h_aclspv_compiler_t;
 
 /**
@@ -25,12 +34,16 @@ typedef x_aclspv_compiler* ae2f_restrict h_aclspv_compiler_t;
  * @brief	result for `aclspv_init_compiler`
  * */
 typedef enum {
+	/** @brief good */
 	ACLSPV_INIT_COMPILER_OK,
+
+	/** argument `i_compiler` was null */
+	ACLSPV_INIT_COMPILER_ARG_WAS_NULL
 } e_aclspv_init_compiler;
 
 /**
  * @method	aclspv_compiler_init
- * @memberof	x_aclspv_compiler
+ * @memberof	h_aclspv_compiler_t
  * @brief	Initialise the instance of the compiler
  *
  * @param	i_compiler	<INIT:aclspv_stop_compiler>	\n
@@ -41,7 +54,7 @@ e_aclspv_init_compiler	aclspv_init_compiler(h_aclspv_compiler_t i_compiler);
 
 /**
  * @method	aclspv_compiler_stop
- * @memberof	x_aclspv_compiler
+ * @memberof	h_aclspv_compiler_t
  * @brief	Deinitialise the instance of the compiler
  *
  * @param	s_compiler	<STOP>				\n
@@ -52,17 +65,18 @@ void	aclspv_stop_compiler(h_aclspv_compiler_t s_compiler);
 
 /**
  * @method	aclspv_compile
- * @memberof	x_aclspv_compiler
+ * @memberof	h_aclspv_compiler_t
  * @brief	compile a files and generate an object
  * @returns	<INIT:aclspv_obj_stop>
  * */
 ae2f_extern ACLSPV_ABI_DECL
 h_aclspv_obj_t	aclspv_compile(
 		h_aclspv_compiler_t	h_compiler,
-		CXFile* const ae2f_restrict		rd_h_files,
-		const size_t				c_files_len,
-		const char* ae2f_restrict const * ae2f_restrict const	rd_compiler_arg_opt,
-		const size_t						rd_compiler_arg_len
+		const char* const					rd_srcpath,
+		const  struct CXUnsavedFile* const ae2f_restrict	rd_unsaved,
+		const size_t						c_unsaved_len,
+		const char* ae2f_restrict const * ae2f_restrict const	rd_argv_opt,
+		const size_t						c_argc
 		);
 
 #endif
