@@ -35,9 +35,24 @@ else()
 endif()
 
 file(GLOB aclspv-src ${PROJECT_SOURCE_DIR}/lib/*)
+file(GLOB aclspv-inc ${PROJECT_SOURCE_DIR}/inc/*)
 
 ae2f_CoreLibTentConfigCustom(
 	aclspv ${ae2f_LIBPREFIX}
 	inc ae3f ${PROJECT_SOURCE_DIR}/cfg/aclspv.cmake.in
-	${aclspv-src}
+	${aclspv-src} ${aclspv-inc}
 	)
+
+target_link_libraries(${ae3f__aclspv__TENT} PUBLIC ae2f::Core clang-c 	
+	LLVMAnalysis
+	LLVMCodeGen
+	LLVMCore
+	LLVMInstCombine
+	LLVMInstrumentation
+	LLVMObjCARCOpts
+	LLVMPasses
+	LLVMScalarOpts
+	LLVMSupport
+	LLVMTransformUtils
+	LLVMVectorize
+	LLVMipo)
