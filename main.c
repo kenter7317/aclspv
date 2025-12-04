@@ -5,8 +5,8 @@
 int main(void) {
 	aclspv_init_global();
 
-	x_aclspv_compiler		compiler;
-	aclspv_init_compiler(&compiler);
+	h_aclspv_compiler_t		compiler;
+	compiler = aclspv_mk_compiler();
 	struct CXUnsavedFile	main_c;
 	const char KERNEL[] =
 		"__kernel void add(__constant int* a, __global int* b) {"
@@ -23,7 +23,7 @@ int main(void) {
 	aclspv_obj_stop(obj);
 #endif
 
-	aclspv_stop_compiler(&compiler);
+	aclspv_free_compiler(compiler);
 	aclspv_stop_global();
 	return 0;
 }

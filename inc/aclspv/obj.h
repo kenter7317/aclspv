@@ -6,12 +6,40 @@
 #include <llvm-c/Core.h>
 #include "./abi.h"
 #include <ae2f/Keys.h>
+#include <ae2f/LangVer.h>
+
+/** 
+ * @struct	x_aclspv_obj
+ * @brief	a structure which contains obj's data, not available on C
+ * */
+typedef struct x_aclspv_obj x_aclspv_obj;
+
+#if ae2f_stdcc_v
+#include <llvm/IR/Module.h>
+#include <memory>
+
+struct x_aclspv_obj {
+	std::unique_ptr<llvm::Module>	m_module;
+	inline x_aclspv_obj(std::unique_ptr<llvm::Module>&& y_module) 
+		: m_module(std::move(y_module)) {}
+};
+
+#endif
 
 /** 
  * @class	h_aclspv_obj_t
  * @brief	an object compiled by a `x_aclspv_compiler`.
  * */
-typedef LLVMModuleRef h_aclspv_obj_t;
+typedef x_aclspv_obj* h_aclspv_obj_t;
+
+/**
+ * @method	aclspv_get_module_from_obj
+ * @memberof	h_aclspv_obj_t
+ * @brief	get `LLVMModuleRef` from an object
+ * @param	h_module	<HANDLE>	an object
+ * */
+ae2f_extern ACLSPV_ABI_DECL ae2f_ccconst
+LLVMModuleRef	aclspv_get_module_from_obj(x_aclspv_obj* ae2f_restrict const	h_obj);
 
 /** 
  * @method	aclspv_obj_stop 
@@ -20,6 +48,6 @@ typedef LLVMModuleRef h_aclspv_obj_t;
  * @param	hs	<HANDLE> <STOP>
  * */
 ae2f_extern ACLSPV_ABI_DECL
-void	aclspv_obj_stop(const h_aclspv_obj_t hs);
+void	aclspv_free_obj(const h_aclspv_obj_t hs);
 
 #endif
