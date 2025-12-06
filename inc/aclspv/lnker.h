@@ -13,7 +13,7 @@
  * @brief	a class to link the compiled objects
  * */
 typedef struct {
-	int u;
+	LLVMModuleRef	m_module;
 } x_aclspv_lnker;
 
 typedef x_aclspv_lnker* ae2f_restrict h_aclspv_lnker_t;
@@ -23,7 +23,9 @@ typedef x_aclspv_lnker* ae2f_restrict h_aclspv_lnker_t;
  * @brief	result of `aclspv_init_lnker`
  * */
 typedef enum {
-	ACLSPV_INIT_LNKER_OK
+	ACLSPV_INIT_LNKER_OK,
+	ACLSPV_INIT_LNKER_ADDR_INVAL,
+	ACLSPV_INIT_LNKER_FAILED
 } e_aclspv_init_lnker;
 
 /**
@@ -50,7 +52,10 @@ aclspv_stop_lnker(h_aclspv_lnker_t s_lnk);
  * @brief	result for `aclspv_add_obj_to_lnker`
  * */
 typedef enum {
-	ACLSPV_ADD_OBJ_TO_LNKER_OK
+	ACLSPV_ADD_OBJ_TO_LNKER_OK,
+	ACLSPV_ADD_OBJ_TO_LNKER_ARG_NIL,
+	ACLSPV_ADD_OBJ_TO_LNKER_HANDLE_INVAL,
+	ACLSPV_ADD_OBJ_TO_LNKER_FAILED
 } e_aclspv_add_obj_to_lnker;
 
 /**

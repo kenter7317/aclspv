@@ -21,18 +21,31 @@ typedef struct x_aclspv_obj x_aclspv_obj;
 #include <llvm/IR/Module.h>
 #include <clang/CodeGen/CodeGenAction.h>
 #include <memory>
+#include <assert.h>
 
 struct x_aclspv_obj {
 	std::unique_ptr<llvm::LLVMContext>	m_modctx;
 	std::unique_ptr<clang::EmitLLVMAction>	m_act;
-
+	std::unique_ptr<llvm::Module>		m_module;
 	inline x_aclspv_obj(
 			std::unique_ptr<llvm::LLVMContext>&& s_modctx,
 			std::unique_ptr<clang::EmitLLVMAction>&& s_act
 			) : 
 		m_modctx(std::move(s_modctx)),
-		m_act(std::move(s_act))
-	{}
+		m_act(std::move(s_act)),
+		m_module(this->m_act ? std::move(this->m_act->takeModule()) : ae2f_NIL)
+	{
+		/** validations */
+		assert(this->m_modctx);
+		assert(this->m_act);
+		assert(this->m_module);
+	}
+
+	inline ~x_aclspv_obj() {
+		m_module.reset();
+		m_act.reset();
+		m_modctx.reset();
+	}
 };
 
 #endif

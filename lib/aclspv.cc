@@ -39,7 +39,7 @@ h_aclspv_obj_t	aclspv_compile(
 		_aclspv_compile_imp(
 				C_vfs, C_fm, C_diagptr, C_action
 				, t_sz0, t_cc, t_diag_opts 
-				, ret, rc_ctx, rd_srcpath
+				, ret, rc_ctx 
 				, rd_unsaved, c_unsaved_len
 				, (rd_argv.data()), c_argc + 1 + compiler_argc
 				);
@@ -54,7 +54,7 @@ h_aclspv_obj_t	aclspv_compile(
 		_aclspv_compile_imp(
 				C_vfs, C_fm, C_diagptr, C_action
 				, t_sz0, t_cc, t_diag_opts
-				, ret, rc_ctx, rd_srcpath
+				, ret, rc_ctx 
 				, rd_unsaved, c_unsaved_len
 				, rd_argv, sizeof(rd_argv) / sizeof(rd_argv[0])
 				);

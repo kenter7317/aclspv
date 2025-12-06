@@ -15,6 +15,8 @@
 #include <clang/Frontend/CompilerInvocation.h>
 #include <clang/Frontend/CompilerInstance.h>
 
+#include <string>
+
 ae2f_MAC((C_vfs, C_fm, C_diagptr, C_action, )) aclspv_compile_imp(
 		size_t&	 ae2f_restrict		t_sz0,
 
@@ -23,8 +25,6 @@ ae2f_MAC((C_vfs, C_fm, C_diagptr, C_action, )) aclspv_compile_imp(
 
 		h_aclspv_obj_t&					ret,
 		std::unique_ptr<llvm::LLVMContext>&		rc_ctx,
-
-		const char* ae2f_restrict const	rd_srcpath,
 		const struct CXUnsavedFile* ae2f_restrict	rd_unsaved,
 		const size_t					c_unsaved_len,
 
@@ -54,15 +54,16 @@ ae2f_MAC((C_vfs, C_fm, C_diagptr, C_action, )) aclspv_compile_imp(
 	(t_cc).getFrontendOpts().Inputs.clear();
 	for((t_sz0) = (c_unsaved_len); (t_sz0)--;) {
 		C_vfs.get()->addFile(
-				(rd_unsaved)->Filename
+				std::string((rd_unsaved[t_sz0]).Filename)
 				, 0, (llvm::MemoryBuffer::getMemBuffer(
 					clang::StringRef(
-						(rd_unsaved)->Contents
-						, (rd_unsaved->Length) - !((rd_unsaved)->Contents[(rd_unsaved)->Length - 1])
+						(rd_unsaved[t_sz0]).Contents
+						, (rd_unsaved[t_sz0].Length) 
+						- !((rd_unsaved)[t_sz0].Contents[(rd_unsaved)[t_sz0].Length - 1])
 						)
 					))
 				);
-		(t_cc).getFrontendOpts().Inputs.emplace_back((rd_unsaved)->Filename, clang::Language::OpenCL);
+		(t_cc).getFrontendOpts().Inputs.emplace_back(std::string((rd_unsaved)[t_sz0].Filename), clang::Language::OpenCL);
 	}
 
 	(t_cc).createSourceManager(*C_fm.get());
@@ -75,7 +76,7 @@ ae2f_MAC((C_vfs, C_fm, C_diagptr, C_action, )) aclspv_compile_imp(
 				, std::move(C_action)
 				);
 	} else {
-		assert(!"ExecuteAction has failed");
+		assert(!(ae2f_static_cast(const char*, "ExecuteAction has failed")));
 		(ret) = ae2f_NIL;
 	}
 }
