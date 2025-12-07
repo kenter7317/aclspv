@@ -14,7 +14,11 @@
  * @see <aclspv/pass.h> 
  * TODO: implement this 
  * */
-ACLSPV_ABI_IMPL e_fn_aclspv_pass aclspv_pass_simplify_ptr_bitcast(LLVMModuleRef _) {
-	(void)_;
+ACLSPV_ABI_IMPL e_fn_aclspv_pass aclspv_pass_simplify_ptr_bitcast(
+		const LLVMModuleRef	M,
+		const h_aclspv_pass_ctx	CTX
+		) {
+	(void)M;
+	(void)CTX;
 	return FN_ACLSPV_PASS_OK;
 }

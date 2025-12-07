@@ -12,8 +12,12 @@ set(ae2f_CoreScript_Wh ${ae2f_ProjRoot}/${ae2f_submod}/ae2f/CoreScript)
 option(aclspv_N_RELOAD_ALWAYS	"reloads aclspv always on configuration when set `OFF`" ON)
 
 if(NOT aclspv_RELOADED)
-	set(aclspv_RELOADED OFF)
+	set(_aclspv_RELOADED OFF)
+else()
+	set(_aclspv_RELOADED ON)
 endif()
+
+option(aclspv_RELOADED "aclspv has been reloaded" ${aclspv_N_RELOAD_ALWAYS})
 
 # Execute git to fetch CoreScript when repository does not exist
 if(NOT EXISTS ${ae2f_CoreScript_Wh})
@@ -62,13 +66,21 @@ endif()
 file(GLOB aclspv-inc ${PROJECT_SOURCE_DIR}/inc/*)
 
 ae2f_Macro_init(1 30 30)
+
+if(NOT ${_aclspv_RELOADED})
+	ae2f_Macro_one(
+		${PROJECT_SOURCE_DIR}/src/pass/ctx.c
+		${PROJECT_SOURCE_DIR}/lib/pass/ctx.auto.h
+		)
+endif()
+
 ae2f_Macro_Lib_V2(
 	ae3f aclspvCore INTERFACE
 	${PROJECT_SOURCE_DIR}/src/ "__NOTHING"
 	${PROJECT_SOURCE_DIR}/src/ "*.def.c*"
 	${PROJECT_SOURCE_DIR}/lib/ ".auto.h"
 	${PROJECT_SOURCE_DIR}/cfg/aclspvCore.cmake.in
-	inc ${aclspv_RELOADED}
+	inc ${_aclspv_RELOADED}
 	)
 
 target_link_libraries(${ae3f__aclspvCore__TENT} INTERFACE
@@ -101,5 +113,3 @@ ae2f_UltraErrWERROR(${ae3f__aclspvABI__TENT} PRIVATE)
 
 add_executable(dummy main.cc)
 target_link_libraries(dummy ae3f::aclspvABI)
-
-option(aclspv_RELOADED "aclspv has been reloaded" ${aclspv_N_RELOAD_ALWAYS})

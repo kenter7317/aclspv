@@ -1,3 +1,8 @@
+/**
+ * @file	pass.h
+ * @brief	pass utility function declarations for module
+ * */
+
 #ifndef aclspv_pass_h
 #define aclspv_pass_h
 
@@ -14,14 +19,20 @@ typedef enum {
 	FN_ACLSPV_PASS_OK,
 	FN_ACLSPV_PASS_MODULE_NIL,
 	FN_ACLSPV_PASS_ALLOC_FAILED
-
 } e_fn_aclspv_pass;
+
+/**
+ * @class	x_aclspv_pass_ctx
+ * @typedef	a_aclspv_pass_ctx
+ * @typedef	h_aclspv_pass_ctx
+ * */
+typedef struct x_aclspv_pass_ctx a_aclspv_pass_ctx, * ae2f_restrict h_aclspv_pass_ctx;
 
 /**
  * @typedef	fn_aclspv_pass_t
  * @brief	pass function
  * */
-typedef e_fn_aclspv_pass fn_aclspv_pass_t(LLVMModuleRef);
+typedef e_fn_aclspv_pass fn_aclspv_pass_t(const LLVMModuleRef, const h_aclspv_pass_ctx);
 
 /**
  * @function	aclspv_pass_rewr_kern_fn
@@ -172,14 +183,58 @@ aclspv_pass_spirv_prepare_fn,
 	aclspv_pass_spirv_lower_constexpr,
 	aclspv_pass_emit_metadata;
 
+
+/**
+ * @enum	e_aclspv_passes
+ * @brief	the given number for passes
+ * */
+typedef enum {
+	ACLSPV_PASSES_OK,
+	ACLSPV_PASSES_REWR_KERN_FN,
+	ACLSPV_PASSES_SET_SPEC_CONST_DEFAULT_VAL,
+	ACLSPV_PASSES_CLUSTER_POD_KERN_ARGS,
+	ACLSPV_PASSES_ALLOC_DESCRIPTOR,
+	ACLSPV_PASSES_LONGVEC_LOWER,
+	ACLSPV_PASSES_SPIRV_BLTIN_LOWER,
+	ACLSPV_PASSES_REP_CL_BLTIN,
+	ACLSPV_PASSES_UBO_TRNSFRM,
+	ACLSPV_PASSES_DIRECT_RSC_ACCESS,
+	ACLSPV_PASSES_SIMPLIFY_PTR_BITCAST,
+	ACLSPV_PASSES_SPIRV_LOWER_MEMSET,
+	ACLSPV_PASSES_SCLRSE_MASKED_MEM_INTRIN,
+	ACLSPV_PASSES_INFER_ADDR_SPACE,
+	ACLSPV_PASSES_LOWER_OPQ_PTR,
+	ACLSPV_PASSES_SPLAT_ARG,
+	ACLSPV_PASSES_INLINE_FUNC,
+	ACLSPV_PASSES_SRAO,
+	ACLSPV_PASSES_GLOB_OPT,
+	ACLSPV_PASSES_GLOB_DCE,
+	ACLSPV_PASSES_DEAD_STORE_DEL,
+	ACLSPV_PASSES_FIXUP_STRUCT_CFG,
+	ACLSPV_PASSES_SPIRV_LOWER_BOOL,
+	ACLSPV_PASSES_SPIRV_LOWER_CONSTEXPR,
+	ACLSPV_PASSES_SPIRV_PREPARE_FN,
+	ACLSPV_PASSES_EMIT_METADATA
+} e_aclspv_passes;
+
+
 /**
  * @function	aclspv_runall_module_passes
- * @brief	run all pass modules declared.
+ * @brief	run all passes for a module
+ * @param	h_module	<HANDLE>	\n
+ * a module to run passes
+ *
+ * @param	wr_res_opt	<WR> <OPT>	\n
+ * When not null, 
+ *
+ * @return	\n
+ * `ACLSPV_PASSES_OK` (0) on success.
+ * When not, the given number for a function will be returned.
  * */
 ae2f_extern ACLSPV_ABI_DECL
-size_t	aclspv_runall_module_passes(
-		LLVMModuleRef		h_module, 
-		e_fn_aclspv_pass* ae2f_restrict	wr_res_opt
+e_aclspv_passes	aclspv_runall_module_passes(
+		const LLVMModuleRef		h_module, 
+		e_fn_aclspv_pass* ae2f_restrict	const wr_res_opt
 		);
 
 #endif

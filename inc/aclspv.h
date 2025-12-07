@@ -44,7 +44,7 @@ typedef uint32_t aclspv_wrd_t;
 #include <clang-c/Index.h>
 
 /**
- * @method	aclspv_compile
+ * @function	aclspv_compile
  * @brief	compile files and generate an object
  * @returns	<INIT:aclspv_free_obj>
  * */
