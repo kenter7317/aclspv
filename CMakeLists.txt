@@ -7,7 +7,6 @@ project(aclspv)
 # Set this source directory as the tree root for project.
 set(ae2f_ProjRoot ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Tree root for project")
 set(ae2f_submod  .submod CACHE STRING "Relative path to submodule (subdirectory)")
-set(ae2f_CoreScript_Wh ${ae2f_ProjRoot}/${ae2f_submod}/ae2f/CoreScript)
 
 option(aclspv_N_RELOAD_ALWAYS	"reloads aclspv always on configuration when set `OFF`" ON)
 
@@ -20,6 +19,7 @@ endif()
 option(aclspv_RELOADED "aclspv has been reloaded" ${aclspv_N_RELOAD_ALWAYS})
 
 # Execute git to fetch CoreScript when repository does not exist
+set(ae2f_CoreScript_Wh ${ae2f_ProjRoot}/${ae2f_submod}/ae2f/CoreScript)
 if(NOT EXISTS ${ae2f_CoreScript_Wh})
 	execute_process(
 		COMMAND git clone https://codeberg.org/ae2f/CoreScript
@@ -34,6 +34,7 @@ endif()
 
 ae2f_CoreLibFetchX(ae2f Core	main)
 ae2f_CoreLibFetchX(ae2f Preproc	main)
+ae2f_CoreLibFetchX(KhronosGroup SPIRV-Headers main)
 
 find_package(LLVM)
 find_package(Clang)
@@ -85,6 +86,10 @@ ae2f_Macro_Lib_V2(
 
 target_link_libraries(${ae3f__aclspvCore__TENT} INTERFACE
 	ae2f::Core ae2f::Preproc
+	)
+
+target_link_libraries(${ae3f__aclspvCore__TENT} INTERFACE 
+	SPIRV-Headers::SPIRV-Headers
 	)
 
 

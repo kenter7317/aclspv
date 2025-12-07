@@ -4,6 +4,7 @@
 #include <ae2f/Macro.h>
 #include <stddef.h>
 #include <ae2f/Keys.h>
+#include <ae2f/Cast.h>
 
 #if	!__ae2f_MACRO_GENERATED
 
@@ -22,6 +23,13 @@ ae2f_retnew void*	f_malloc(size_t);
 void*	f_memcpy(void*, const void*, size_t);
 
 #endif
+
+#include <string.h>
+#include <stdlib.h>
+
+#define _aclspv_free(a, b)	free(a)
+#define _aclspv_malloc(a)	malloc(ae2f_static_cast(size_t, a))
+#define _aclspv_memcpy(a, b, c)	memcpy(a, b, ae2f_static_cast(size_t, a))
 
 
 ae2f_MAC() aclspv_init_vec(aclspv_vec	i_vec) {

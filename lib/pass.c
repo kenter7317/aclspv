@@ -19,26 +19,23 @@ aclspv_runall_module_passes(
 	a_aclspv_pass_ctx	ctx;
 
 	_aclspv_init_vec(ctx.m_v0);
+	_aclspv_init_vec(ctx.m_v1);
 
 	unless(h_module) {
 		assert(Z(FN_ACLSPV_PASS_MODULE_NIL));
-		code		= ACLSPV_PASSES_REWR_KERN_FN;
+		code		= ACLSPV_PASSES_ADD_KERN_METADATA;
 		codepass	= FN_ACLSPV_PASS_MODULE_NIL;
 		goto LBL_RET;
 	}
 
-	if((codepass = aclspv_pass_rewr_kern_fn(h_module, &ctx))) {
-		code = ACLSPV_PASSES_REWR_KERN_FN;
-		goto LBL_RET;
-	}
-
-	if((codepass = aclspv_pass_set_spec_const_default_val(h_module, &ctx))) {
-		code = ACLSPV_PASSES_SET_SPEC_CONST_DEFAULT_VAL;
+	if((codepass = aclspv_pass_add_kern_metadata(h_module, &ctx))) {
+		code = ACLSPV_PASSES_ADD_KERN_METADATA;
 		goto LBL_RET;
 	}
 
 LBL_RET:
 	_aclspv_stop_vec(aclspv_free, ctx.m_v0);
+	_aclspv_stop_vec(aclspv_free, ctx.m_v1);
 
 	if(wr_res_opt) *wr_res_opt = codepass;
 	return code;

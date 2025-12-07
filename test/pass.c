@@ -24,8 +24,12 @@ int main(void) {
 	h_aclspv_obj_t		obj[2];
 	x_aclspv_lnker		lnk;
 
-	size_t			pass_progress;
-	e_fn_aclspv_pass	pass_result;
+	const char* args[] = {
+		"-std=CL1.2"
+	};
+
+	(void)args;
+
 
 	aclspv_init_global();
 	if(aclspv_init_lnker(&lnk)) {
@@ -43,13 +47,13 @@ int main(void) {
 	obj[0] = aclspv_compile(
 			"main.cl"
 			, files, 1
-			, ae2f_NIL, 0
+			, args, 1
 			);
 
 	obj[1] = aclspv_compile(
 			"_main.cl"
 			, files + 1, 1
-			, ae2f_NIL, 0
+			, args, 1
 			);
 
 	assert(obj[0]);
@@ -61,16 +65,38 @@ int main(void) {
 	}
 #endif
 
-	pass_progress = aclspv_runall_module_passes(
-			lnk.m_module
-			, &pass_result
-			);
+	do {
+		char*  final_llvm = LLVMPrintModuleToString(lnk.m_module);
+		puts("OLD LLVM OUTPUT START\n");
+		puts(final_llvm);
+		puts("\nOLD LLVM OUTPUT END");
+		LLVMDisposeMessage(final_llvm);
+	} while(0);
 
-	printf(
-			"pass_progress: %lu, pass_result: %u\n"
-			, pass_progress
-			, pass_result
-			);
+#if 1
+	do {
+		e_aclspv_passes		pass_progress;
+		e_fn_aclspv_pass	pass_result;
+		pass_progress = aclspv_runall_module_passes(
+				lnk.m_module
+				, &pass_result
+				);
+
+		printf(
+				"pass_progress: %u, pass_result: %u\n"
+				, pass_progress
+				, pass_result
+		      );
+	} while(0);
+#endif
+
+	do {
+		char*  final_llvm = LLVMPrintModuleToString(lnk.m_module);
+		puts("\nNEW LLVM OUTPUT START\n");
+		puts(final_llvm);
+		puts("\nNEW LLVM OUTPUT END");
+		LLVMDisposeMessage(final_llvm);
+	} while(0);
 
 	aclspv_stop_lnker(&lnk);
 
