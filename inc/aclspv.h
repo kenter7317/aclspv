@@ -29,13 +29,13 @@ e_aclspv_init_global	aclspv_init_global(void);
 
 /**
  * @fn	aclspv_stop_global
- * @brief	stops the library's globla state
+ * @brief	stops the library's global state
  * */
 ae2f_extern ACLSPV_ABI_DECL
 void	aclspv_stop_global(void);
 
-/** 
- * @typedef	aclspv_wrd_t 
+/**
+ * @typedef	aclspv_wrd_t
  * @brief	Word of spir-v as 32-bit unsigned integer.
  * */
 typedef uint32_t aclspv_wrd_t;

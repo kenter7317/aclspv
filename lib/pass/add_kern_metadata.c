@@ -4,7 +4,7 @@
 #include <string.h>
 #include <aclspv/md.h>
 
-#define md_kind_str aclspv_md_args
+#define md_kind_str ACLSPV_MD_ARGS 
 
 IMPL_PASS_RET aclspv_pass_add_kern_metadata(
 		const LLVMModuleRef	M,

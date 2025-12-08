@@ -7,7 +7,7 @@
 #ifndef aclspv_md_h
 #define aclspv_md_h
 
-#define aclspv_md_argknd	"aclspv.krnl.argknd"
-#define aclspv_md_args		"aclspv.krnl.args"
+#define ACLSPV_MD_ARGKND	"aclspv.krnl.argknd"
+#define ACLSPV_MD_ARGS		"aclspv.krnl.args"
 
 #endif

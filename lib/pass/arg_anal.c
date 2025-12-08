@@ -8,7 +8,7 @@
 #include <aclspv/md.h>
 
 
-#define md_kind_str aclspv_md_argknd
+#define md_kind_str ACLSPV_MD_ARGKND 
 
 #define ZSTR(a)	0
 
