@@ -33,6 +33,11 @@ aclspv_runall_module_passes(
 		goto LBL_RET;
 	}
 
+	if((codepass = aclspv_pass_arg_anal(h_module, &ctx))) {
+		code = ACLSPV_PASSES_ARG_ANAL;
+		goto LBL_RET;
+	}
+
 LBL_RET:
 	_aclspv_stop_vec(aclspv_free, ctx.m_v0);
 	_aclspv_stop_vec(aclspv_free, ctx.m_v1);

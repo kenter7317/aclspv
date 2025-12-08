@@ -39,8 +39,16 @@ typedef e_fn_aclspv_pass fn_aclspv_pass_t(const LLVMModuleRef, const h_aclspv_pa
  * @brief	Adds metadata to kernel functions for argument analysis and entry point identification.
  * @details	Prepares OpenCL kernel metadata for Vulkan entry point mapping.
  * */
-ae2f_extern ACLSPV_ABI_DECL fn_aclspv_pass_t aclspv_pass_add_kern_metadata;
+ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_add_kern_metadata;
 
+/**
+ * @fn		aclspv_pass_arg_anal
+ * @brief	Analyzes kernel argument kinds and assigns types.
+ * @details	\n
+ * kernel argument kinds e.g., POD, images, samplers	\n
+ * assign types e.g.,  ArgKind::Pod or ArgKind::Image.
+ * */
+ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_arg_anal;
 
 /**
  * @enum	e_aclspv_passes
@@ -48,7 +56,8 @@ ae2f_extern ACLSPV_ABI_DECL fn_aclspv_pass_t aclspv_pass_add_kern_metadata;
  * */
 typedef enum {
 	ACLSPV_PASSES_OK,
-	ACLSPV_PASSES_ADD_KERN_METADATA
+	ACLSPV_PASSES_ADD_KERN_METADATA,
+	ACLSPV_PASSES_ARG_ANAL
 } e_aclspv_passes;
 
 
@@ -70,5 +79,6 @@ e_aclspv_passes	aclspv_runall_module_passes(
 		const LLVMModuleRef		h_module, 
 		e_fn_aclspv_pass* ae2f_restrict	const wr_res_opt
 		);
+
 
 #endif

@@ -2,10 +2,10 @@
 
 #include <llvm-c/Core.h>
 #include <string.h>
+#include <aclspv/md.h>
 
-#define md_kind_str	"aclspv.kernel.args"
-
-ACLSPV_ABI_IMPL e_fn_aclspv_pass
+#define md_kind_str	aclspv_md_args
+	ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass
 aclspv_pass_add_kern_metadata(
 		const LLVMModuleRef	M,
 		const h_aclspv_pass_ctx	CTX
@@ -37,7 +37,7 @@ aclspv_pass_add_kern_metadata(
 						kern_fn,
 						kind_id,
 						LLVMMDNodeInContext2(C, ae2f_NIL, 0)
-					       );
+						);
 				continue;
 			}
 
@@ -79,7 +79,7 @@ aclspv_pass_add_kern_metadata(
 					kern_fn,
 					kind_id,
 					LLVMMDNodeInContext2(C, arg_type_mds, (size_t)nprms)
-				       );
+					);
 		}
 	}
 
