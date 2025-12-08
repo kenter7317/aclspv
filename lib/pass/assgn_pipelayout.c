@@ -18,7 +18,6 @@
 #define VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER 6
 #define VK_DESCRIPTOR_TYPE_STORAGE_BUFFER 7
 
-#define ACLSPV_MD_PIPELINE_LAYOUT "aclspv.pipelayout"
 
 
 /** custom descriptor -> vulkan descriptor */
@@ -52,8 +51,7 @@ IMPL_PASS_RET aclspv_pass_assgn_pipelayout(
 
 	unsigned i;
 
-	LLVMMetadataRef pc_ranges_node;
-	LLVMMetadataRef set_layouts_node;
+	LLVMValueRef pc_ranges_node, set_layouts_node;
 
 	LLVMValueRef F, FNxt;
 
@@ -95,35 +93,34 @@ IMPL_PASS_RET aclspv_pass_assgn_pipelayout(
 		/** Create Push Constant Range Metadata */
 
 		if (push_constant_size > 0) {
-			LLVMMetadataRef pc_range_ops[3], pc_range_node;
+			LLVMValueRef pc_range_ops[3], pc_range_node;
 
-			pc_range_ops[0] = LLVMValueAsMetadata(
-					LLVMConstInt(
-						LLVMInt32TypeInContext(C)
-						, (unsigned long)VK_SHADER_STAGE_COMPUTE_BIT
-						, (LLVMBool)0
-						)
+			pc_range_ops[0] = LLVMConstInt(
+					LLVMInt32TypeInContext(C)
+					, (unsigned long)VK_SHADER_STAGE_COMPUTE_BIT
+					, (LLVMBool)0
 					);
-			pc_range_ops[1] = LLVMValueAsMetadata(LLVMConstInt(LLVMInt32TypeInContext(C), 0, 0)); 
-			pc_range_ops[2] = LLVMValueAsMetadata(LLVMConstInt(LLVMInt32TypeInContext(C), push_constant_size, 0));
 
-			pc_range_node = LLVMMDNodeInContext2(C, pc_range_ops, 3);
-			pc_ranges_node = LLVMMDNodeInContext2(C, &pc_range_node, 1);
+			pc_range_ops[1] = (LLVMConstInt(LLVMInt32TypeInContext(C), 0, 0)); 
+			pc_range_ops[2] = (LLVMConstInt(LLVMInt32TypeInContext(C), push_constant_size, 0));
+
+			pc_range_node = LLVMMDNodeInContext(C, pc_range_ops, 3);
+			pc_ranges_node = LLVMMDNodeInContext(C, &pc_range_node, 1);
 		} else {
-			pc_ranges_node = LLVMMDNodeInContext2(C, ae2f_NIL, 0);
+			pc_ranges_node = LLVMMDNodeInContext(C, ae2f_NIL, 0);
 		}
 
 #if 1
 		{
 			/** Create Descriptor Set Layout Metadata */
-			LLVMMetadataRef set_layout_ops[2];
-			LLVMMetadataRef	set_layout_node;
+			LLVMValueRef set_layout_ops[2];
+			LLVMValueRef	set_layout_node;
 
 			if (num_descriptors > 0) {
 				unsigned current_binding = 0;
 
-				_aclspv_grow_vec(_aclspv_malloc, _aclspv_free, CTX->m_v1, (size_t)(sizeof(LLVMMetadataRef) * num_descriptors));
-#define	bindings	ae2f_static_cast(LLVMMetadataRef*, CTX->m_v1.m_p)
+				_aclspv_grow_vec(_aclspv_malloc, _aclspv_free, CTX->m_v1, (size_t)(sizeof(LLVMValueRef) * num_descriptors));
+#define	bindings	ae2f_static_cast(LLVMValueRef* ae2f_restrict, CTX->m_v1.m_p)
 
 				for (i = nprms; i--; ) {
 					const LLVMValueRef op = arg_kinds_node_opers[i]; 
@@ -131,7 +128,7 @@ IMPL_PASS_RET aclspv_pass_assgn_pipelayout(
 					const char* ae2f_restrict const kind_str = LLVMGetMDString(op, &len);
 
 					const unsigned desc_type = get_descriptor_type(kind_str);
-					LLVMMetadataRef binding_ops[4];
+					LLVMValueRef binding_ops[4];
 
 					if (strcmp(kind_str, ACLSPV_ARGKND_POD_PSHCONST) == 0 || strcmp(kind_str, ACLSPV_ARGKND_LOC) == 0) {
 						continue;
@@ -139,23 +136,23 @@ IMPL_PASS_RET aclspv_pass_assgn_pipelayout(
 
 					assert(desc_type != (unsigned)-1);
 
-					binding_ops[0] = LLVMValueAsMetadata(LLVMConstInt(LLVMInt32TypeInContext(C), current_binding, 0));
-					binding_ops[1] = LLVMValueAsMetadata(LLVMConstInt(LLVMInt32TypeInContext(C), desc_type, 0));
-					binding_ops[2] = LLVMValueAsMetadata(LLVMConstInt(LLVMInt32TypeInContext(C), 1, 0)); /** count */
-					binding_ops[3] = LLVMValueAsMetadata(LLVMConstInt(LLVMInt32TypeInContext(C), VK_SHADER_STAGE_COMPUTE_BIT, 0));
+					binding_ops[0] = (LLVMConstInt(LLVMInt32TypeInContext(C), current_binding, 0));
+					binding_ops[1] = (LLVMConstInt(LLVMInt32TypeInContext(C), desc_type, 0));
+					binding_ops[2] = (LLVMConstInt(LLVMInt32TypeInContext(C), 1, 0)); /** count */
+					binding_ops[3] = (LLVMConstInt(LLVMInt32TypeInContext(C), VK_SHADER_STAGE_COMPUTE_BIT, 0));
 
-					bindings[current_binding++] = (LLVMMetadataRef)LLVMMDNodeInContext2(C, binding_ops, 4);
+					bindings[current_binding++] = LLVMMDNodeInContext(C, binding_ops, 4);
 				}
 
 				/** set number */
-				set_layout_ops[0] = LLVMValueAsMetadata(LLVMConstInt(LLVMInt32TypeInContext(C), 0, 0)); 
+				set_layout_ops[0] = (LLVMConstInt(LLVMInt32TypeInContext(C), 0, 0)); 
 
 				/** bindings node */
-				set_layout_ops[1] = LLVMMDNodeInContext2(C, bindings, (size_t)num_descriptors);
-				set_layout_node = LLVMMDNodeInContext2(C, set_layout_ops, 2);
-				set_layouts_node = LLVMMDNodeInContext2(C, &set_layout_node, 1);
+				set_layout_ops[1] = LLVMMDNodeInContext(C, bindings, num_descriptors);
+				set_layout_node = LLVMMDNodeInContext(C, set_layout_ops, 2ul);
+				set_layouts_node = LLVMMDNodeInContext(C, &set_layout_node, 1);
 			} else {
-				set_layouts_node = LLVMMDNodeInContext2(C, ae2f_NIL, 0);
+				set_layouts_node = LLVMMDNodeInContext(C, ae2f_NIL, 0);
 			}
 		}
 #undef	bindings
@@ -165,11 +162,11 @@ IMPL_PASS_RET aclspv_pass_assgn_pipelayout(
 
 		/** Create final pipeline layout metadata */
 		{
-			LLVMMetadataRef layout_ops[2];
+			LLVMValueRef layout_ops[2];
 			layout_ops[0] = pc_ranges_node;
 			layout_ops[1] = set_layouts_node;
 
-			LLVMSetMetadata(F, pipelayout_md_id, LLVMMetadataAsValue(C, LLVMMDNodeInContext2(C, layout_ops, 2)));
+			LLVMGlobalSetMetadata(F, pipelayout_md_id, LLVMValueAsMetadata(LLVMMDNodeInContext(C, layout_ops, 2)));
 		}
 	}
 

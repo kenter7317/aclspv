@@ -47,7 +47,7 @@ ae2f_noexcept static const char* get_arg_kind(
 				default:
 				case CL_ADDRSPACE_LOC:
 					assert(ZSTR("Unexpected value"));
-					return ae2f_NIL;
+					return ACLSPV_ARGKND_LOC;
 
 				case CL_ADDRSPACE_GLOB:
 					return ACLSPV_ARGKND_BUFF;

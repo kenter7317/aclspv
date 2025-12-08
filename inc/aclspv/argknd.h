@@ -18,9 +18,9 @@
  * @brief 	argument kind:: POD	(Plain Old Data)
  * @details	as push constant
  * */
-#define ACLSPV_ARGKND_POD		"aclspv.argknd.pod"
-#define ACLSPV_ARGKND_POD_UBO		"aclspv.argknd.pod.ubo"
-#define ACLSPV_ARGKND_POD_PSHCONST	"aclspv.argknd.pod.pshconst"
+#define ACLSPV_ARGKND_POD		"pod"
+#define ACLSPV_ARGKND_POD_UBO		"pod_ubo"
+#define ACLSPV_ARGKND_POD_PSHCONST	"pod_pushconstant"
 
 /**
  * @def		ACLSPV_ARGKND_BUFF
@@ -30,8 +30,8 @@
  * @brief	argument kind:: storage buffer
  * @details	as UBO			(Uniform Buffer Object)
  * */
-#define	ACLSPV_ARGKND_BUFF	"aclspv.argknd.buff"
-#define	ACLSPV_ARGKND_BUFF_UBO	"aclspv.argknd.buff.ubo"
+#define	ACLSPV_ARGKND_BUFF	"buffer"
+#define	ACLSPV_ARGKND_BUFF_UBO	"buffer_ubo"
 
 /**
  * @def		ACLSPV_ARGKND_RO_IMG
@@ -40,19 +40,19 @@
  * @def		ACLSPV_ARGKND_WO_IMG
  * @brief	argument kind:: write-only image
  * */
-#define	ACLSPV_ARGKND_RO_IMG	"aclspv.argknd.ro.img"
-#define	ACLSPV_ARGKND_WO_IMG	"aclspv.argknd.wo.img"
+#define	ACLSPV_ARGKND_RO_IMG	"read_only_image"
+#define	ACLSPV_ARGKND_WO_IMG	"write_only_image"
 
 /**
  * @def		ACLSPV_ARGKND_SMPLR
  * @brief	argument kind:: sampler
  * */
-#define ACLSPV_ARGKND_SMPLR	"aclspv.argknd.smplr"
+#define ACLSPV_ARGKND_SMPLR	"sampler"
 
 /**
  * @def		ACLSPV_ARGKND_LOC
  * @brief	argument kind:: local
  * */
-#define ACLSPV_ARGKND_LOC	"aclspv.argknd.loc"
+#define ACLSPV_ARGKND_LOC	"local"
 
 #endif
