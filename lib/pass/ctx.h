@@ -7,6 +7,8 @@
 #include <ae2f/c90/StdBool.h>
 #include <ae2f/c90/StdInt.h>
 
+#define IMPL_PASS_RET	ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass
+
 typedef struct {
 	void* ae2f_restrict 	
 		m_p;

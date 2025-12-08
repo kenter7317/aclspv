@@ -8,8 +8,7 @@
 
 #define Z(a)	0
 
-ACLSPV_ABI_IMPL e_aclspv_passes	
-aclspv_runall_module_passes(
+ae2f_noexcept ACLSPV_ABI_IMPL e_aclspv_passes aclspv_runall_module_passes(
 		const LLVMModuleRef			h_module, 
 		e_fn_aclspv_pass* ae2f_restrict const	wr_res_opt
 		)
@@ -35,6 +34,11 @@ aclspv_runall_module_passes(
 
 	if((codepass = aclspv_pass_arg_anal(h_module, &ctx))) {
 		code = ACLSPV_PASSES_ARG_ANAL;
+		goto LBL_RET;
+	}
+
+	if((codepass = aclspv_pass_assgn_pipelayout(h_module, &ctx))) {
+		code = ACLSPV_PASSES_ASSGN_PIPELAYOUT;
 		goto LBL_RET;
 	}
 

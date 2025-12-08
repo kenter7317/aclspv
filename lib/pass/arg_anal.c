@@ -7,49 +7,100 @@
 #include <aclspv/argknd.h>
 #include <aclspv/md.h>
 
+
 #define md_kind_str aclspv_md_argknd
 
 #define ZSTR(a)	0
 
-ae2f_retnew static const char* get_arg_kind(const LLVMValueRef param) {
-    const LLVMTypeRef type = LLVMTypeOf(param);
+typedef enum { 
+	/** @brief __global */
+	CL_ADDRSPACE_GLOB	= 1,
 
- 
-    if (LLVMGetTypeKind(type) == LLVMPointerTypeKind) {
+	/** @brief __constant */
+	CL_ADDRSPACE_CONST	= 2,
 
-        const LLVMTypeRef pointee_type = LLVMGetElementType(type);
-	assert(pointee_type);
+	/** @brief __local */
+	CL_ADDRSPACE_LOC	= 3
+} e_cl_addrspace;
 
-	/* is `void*`? */
-	if(LLVMPointerTypeIsOpaque(type)) {
-		return ACLSPV_ARGKND_POD;
-	}
+ae2f_noexcept static const char* get_arg_kind(
+		const LLVMValueRef ae2f_restrict param, 
+		const unsigned param_index
+		) {
+	const LLVMTypeRef type = LLVMTypeOf(param);
+	const LLVMValueRef func = LLVMGetParamParent(param);
 
-        if (LLVMGetTypeKind(pointee_type) == LLVMStructTypeKind) {
-		const char* ae2f_restrict const name = LLVMGetStructName(pointee_type);
+	/** 1-based in llvm */
+	const LLVMAttributeIndex attr_index = param_index + 1;
 
-		if (name) {
-			if (strstr(name, "image2d_t") || strstr(name, "image3d_t")) {
-				return strstr(name, "write_only") ?
-					ACLSPV_ARGKND_WO_IMG : ACLSPV_ARGKND_RO_IMG;
+	if (LLVMGetTypeKind(type) == LLVMPointerTypeKind) {
+		const unsigned addr_space = LLVMGetPointerAddressSpace(type);
+		LLVMTypeRef	pointee_type;
+
+		/** __local */
+		if (addr_space == CL_ADDRSPACE_LOC) {
+			return ACLSPV_ARGKND_LOC;
+		}
+
+		if (LLVMPointerTypeIsOpaque(type)) {
+			switch((e_cl_addrspace)addr_space) {
+				default:
+				case CL_ADDRSPACE_LOC:
+					assert(ZSTR("Unexpected value"));
+					return ae2f_NIL;
+
+				case CL_ADDRSPACE_GLOB:
+					return ACLSPV_ARGKND_BUFF;
+
+				case CL_ADDRSPACE_CONST:
+					return ACLSPV_ARGKND_BUFF_UBO;
 			}
-			if (strstr(name, "sampler_t")) {
-				return ACLSPV_ARGKND_SMPLR;
+		}
+
+		pointee_type = LLVMGetElementType(type);
+
+		if (LLVMGetTypeKind(pointee_type) == LLVMStructTypeKind) {
+			const char* ae2f_restrict const name = LLVMGetStructName(pointee_type);
+			if (name) {
+				if (strstr(name, "opencl.sampler_t")) {
+					return ACLSPV_ARGKND_SMPLR;
+				}
+				if (strstr(name, "opencl.image")) {
+					const unsigned writeonly_kind = LLVMGetEnumAttributeKindForName("writeonly", sizeof("writeonly") - 1);
+					if (LLVMGetEnumAttributeAtIndex(func, attr_index, writeonly_kind)) {
+						return ACLSPV_ARGKND_WO_IMG;
+					}
+					return ACLSPV_ARGKND_RO_IMG;
+				}
 			}
-		} else {
-			assert(0);
+		}
+
+		switch((e_cl_addrspace)addr_space) {
+			case CL_ADDRSPACE_LOC:
+			default:
+				assert(0);
+				return ae2f_NIL;
+
+			case CL_ADDRSPACE_GLOB:
+				if(LLVMGetEnumAttributeAtIndex(func, attr_index, LLVMGetEnumAttributeKindForName(
+								"readonly"
+								, sizeof("readonly") - 1)))
+					return ACLSPV_ARGKND_BUFF_UBO;
+
+				return ACLSPV_ARGKND_BUFF;
+
+			case CL_ADDRSPACE_CONST: 
+				return ACLSPV_ARGKND_BUFF_UBO;
 		}
 	}
-    }
 
-
-    return ACLSPV_ARGKND_POD;
+	/** if non-pointer, i would think it to be push constant  */
+	return ACLSPV_ARGKND_POD_PSHCONST;
 }
 
-	ae2f_noexcept ACLSPV_ABI_IMPL e_fn_aclspv_pass
-aclspv_pass_arg_anal(
+IMPL_PASS_RET aclspv_pass_arg_anal(
 		const LLVMModuleRef	M,
-		const h_aclspv_pass_ctx	CTX	
+		h_aclspv_pass_ctx	CTX	
 		)
 {
 	const LLVMContextRef C = LLVMGetModuleContext(M);
@@ -106,7 +157,10 @@ aclspv_pass_arg_anal(
 			for (j = nprms; j--; ) {
 				const char* ae2f_restrict kind_str;
 				assert(j < nprms);
-				kind_str = get_arg_kind(prms[j]);
+				kind_str = get_arg_kind(prms[j], j);
+				unless(kind_str)
+					return FN_ACLSPV_PASS_FAILED_FND_ARGKND;
+
 				arg_kind_mds[j] =
 					LLVMMDStringInContext2(C, kind_str, strlen(kind_str));
 			}

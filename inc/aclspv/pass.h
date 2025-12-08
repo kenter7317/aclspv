@@ -16,9 +16,17 @@
  * @brief	results of `fn_aclspv_pass_t` like functions
  * */
 typedef enum {
+	/** @brief	success */
 	FN_ACLSPV_PASS_OK,
+
+	/** @brief	passed module was null. */
 	FN_ACLSPV_PASS_MODULE_NIL,
-	FN_ACLSPV_PASS_ALLOC_FAILED
+
+	/** @brief	allocation has failed. */
+	FN_ACLSPV_PASS_ALLOC_FAILED,
+
+	/** @brief	finding argument kind has been failed. */
+	FN_ACLSPV_PASS_FAILED_FND_ARGKND
 } e_fn_aclspv_pass;
 
 /**
@@ -50,6 +58,14 @@ ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_add_kern_
  * */
 ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_arg_anal;
 
+
+/**
+ * @fn		aclspv_pass_assgn_pipelayout
+ * @brief	Assigns Vulkan pipeline layout information, including descriptor sets and push constant ranges.
+ * @details	Ensures Vulkan-compliant layout for SPIR-V entry points.
+ * */
+ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_assgn_pipelayout;
+
 /**
  * @enum	e_aclspv_passes
  * @brief	the given number for passes
@@ -57,7 +73,8 @@ ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_arg_anal;
 typedef enum {
 	ACLSPV_PASSES_OK,
 	ACLSPV_PASSES_ADD_KERN_METADATA,
-	ACLSPV_PASSES_ARG_ANAL
+	ACLSPV_PASSES_ARG_ANAL,
+	ACLSPV_PASSES_ASSGN_PIPELAYOUT
 } e_aclspv_passes;
 
 

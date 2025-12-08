@@ -4,9 +4,9 @@
 #include <string.h>
 #include <aclspv/md.h>
 
-#define md_kind_str	aclspv_md_args
-	ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass
-aclspv_pass_add_kern_metadata(
+#define md_kind_str aclspv_md_args
+
+IMPL_PASS_RET aclspv_pass_add_kern_metadata(
 		const LLVMModuleRef	M,
 		const h_aclspv_pass_ctx	CTX
 		)
