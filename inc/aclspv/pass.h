@@ -111,6 +111,14 @@ ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_entp_abi_
  * */
 ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_fix_mem_access;
 
+
+/**
+ * @fn		aclspv_pass_inline_entp
+ * @brief	Inlines kernel entry points for single-kernel modules.
+ * @details	Optimizes for Vulkan's flat module structure.
+ * */
+ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_inline_entp;
+
 /**
  * @enum	e_aclspv_passes
  * @brief	the given number for passes
@@ -142,7 +150,10 @@ typedef enum {
 	ACLSPV_PASSES_ENTP_ABI_STRIP,
 
 	/** @brief error from `aclspv_pass_fix_mem_access` */
-	ACLSPV_PASSES_FIX_MEM_ACCESS
+	ACLSPV_PASSES_FIX_MEM_ACCESS,
+
+	/** @brief error from `aclspv_pass_inline_entp` */
+	ACLSPV_PASSES_INLINE_ENTP
 } e_aclspv_passes;
 
 
