@@ -8,8 +8,8 @@
 #include <string.h>
 #include <assert.h>
 
-#include <aclspv/argknd.h>
-#include <aclspv/md.h>
+#include "./md.h"
+#include "./argknd.h"
 
 /** From vulkan_core.h */
 #define VK_SHADER_STAGE_COMPUTE_BIT 0x00000020

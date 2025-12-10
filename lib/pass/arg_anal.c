@@ -4,9 +4,8 @@
 #include <string.h>
 #include <assert.h>
 
-#include <aclspv/argknd.h>
-#include <aclspv/md.h>
-
+#include "./argknd.h"
+#include "./md.h"
 
 #define md_kind_str ACLSPV_MD_ARGKND 
 

@@ -4,9 +4,8 @@
 #include <string.h>
 #include <assert.h>
 
-#include <aclspv/argknd.h>
-#include <aclspv/md.h>
-
+#include "./argknd.h"
+#include "md.h"
 #define ACLSPV_MD_POD_CLUSTERS "aclspv.pod_clusters"
 
 #ifndef unless

@@ -16,75 +16,111 @@
 #include <assert.h>
 
 
-/** A struct to map OpenCL mangled names to internal builtin names */
+/** 
+ * @struct	builtin_map
+ * @brief	A struct to map OpenCL mangled names to internal builtin names 
+ * */
 typedef struct {
-	const char* ae2f_restrict ocl_mangled_name;
-	const char* ae2f_restrict internal_name;
-} builtin_mapping;
+	const char* ae2f_restrict m_ocl_name;
+	const char* ae2f_restrict m_internal_name;
+} aclspv_ocl_bltin_map;
+
+#define builtin_map g_aclspv_ocl_bltin_map
 
 /**
  * A list of builtins to handle.
  * This list can be extended to support more OpenCL builtins.
  * */ 
-static const builtin_mapping builtin_map[] = {
+static const aclspv_ocl_bltin_map g_aclspv_ocl_bltin_map[] = {
     /* === Work-item builtins === */
     {"_Z13get_global_idj",      "aclspv.get_global_id"},
-    {"get_global_id",     	"aclspv.get_global_id"},
+    {"get_global_id",           "aclspv.get_global_id"},
 
     {"_Z12get_local_idj",       "aclspv.get_local_id"},
-    {"get_local_id",       	"aclspv.get_local_id"},
+    {"get_local_id",            "aclspv.get_local_id"},
 
     {"_Z12get_group_idj",       "aclspv.get_group_id"},
+    {"get_group_id",            "aclspv.get_group_id"},
+
     {"_Z14get_global_sizej",    "aclspv.get_global_size"},
+    {"get_global_size",         "aclspv.get_global_size"},
+
     {"_Z13get_local_sizej",     "aclspv.get_local_size"},
+    {"get_local_size",          "aclspv.get_local_size"},
+
+    {"_Z15get_global_offsetj",  "aclspv.get_global_offset"},
+    {"get_global_offset",       "aclspv.get_global_offset"},
+
     {"_Z12get_work_dimv",       "aclspv.get_work_dim"},
+    {"get_work_dim",            "aclspv.get_work_dim"},
+
     {"_Z16get_num_groupsj",     "aclspv.get_num_groups"},
+    {"get_num_groups",          "aclspv.get_num_groups"},
+
+    {"_Z13get_global_idj",      "aclspv.get_global_id"},
+    {"get_global_id",           "aclspv.get_global_id"},
 
     /* === Barrier === */
     {"_Z7barrierj",             "aclspv.barrier"},
+    {"barrier",                 "aclspv.barrier"},
 
-    /* === 32-bit Integer Atomics (OpenCL 1.2 / SPIR-V 1.0 compatible) === */
+    /* === Memory fences === */
+    {"_Z14mem_fencej",          "aclspv.mem_fence"},
+    {"mem_fence",               "aclspv.mem_fence"},
 
-    /* atomic_add / atomic_sub (return old value) */
-    {"_Z10atomic_addPU3AS1Vii", "aclspv.atomic_add"},   /* volatile global  i32* , i32 */
+    {"_Z18read_mem_fencej",     "aclspv.read_mem_fence"},
+    {"read_mem_fence",          "aclspv.read_mem_fence"},
+
+    {"_Z19write_mem_fencej",    "aclspv.write_mem_fence"},
+    {"write_mem_fence",         "aclspv.write_mem_fence"},
+
+    /* === 32-bit Integer Atomics === */
+    {"_Z10atomic_addPU3AS1Vii", "aclspv.atomic_add"},
+    {"_Z10atomic_addPU3AS3Vii", "aclspv.atomic_add"},
     {"_Z10atomic_subPU3AS1Vii", "aclspv.atomic_sub"},
-    {"_Z10atomic_addPU3AS3Vii", "aclspv.atomic_add"},   /* volatile local   i32* , i32 */
     {"_Z10atomic_subPU3AS3Vii", "aclspv.atomic_sub"},
 
-    /* atomic_xchg (return old value) */
     {"_Z11atomic_xchgPU3AS1Vii", "aclspv.atomic_xchg"},
     {"_Z11atomic_xchgPU3AS3Vii", "aclspv.atomic_xchg"},
 
-    /* atomic_inc / atomic_dec (return old value) */
     {"_Z9atomic_incPU3AS1Vi",   "aclspv.atomic_inc"},
-    {"_Z9atomic_decPU3AS1Vi",   "aclspv.atomic_dec"},
     {"_Z9atomic_incPU3AS3Vi",   "aclspv.atomic_inc"},
+    {"_Z9atomic_decPU3AS1Vi",   "aclspv.atomic_dec"},
     {"_Z9atomic_decPU3AS3Vi",   "aclspv.atomic_dec"},
 
-    /* atomic_cmpxchg (return old value) */
     {"_Z14atomic_cmpxchgPU3AS1Viii", "aclspv.atomic_cmpxchg"},
     {"_Z14atomic_cmpxchgPU3AS3Viii", "aclspv.atomic_cmpxchg"},
 
-    /* atomic_min / atomic_max (signed & unsigned) */
     {"_Z10atomic_minPU3AS1Vii", "aclspv.atomic_min"},
-    {"_Z10atomic_maxPU3AS1Vii", "aclspv.atomic_max"},
     {"_Z10atomic_minPU3AS3Vii", "aclspv.atomic_min"},
+    {"_Z10atomic_maxPU3AS1Vii", "aclspv.atomic_max"},
     {"_Z10atomic_maxPU3AS3Vii", "aclspv.atomic_max"},
 
-
-    /** unsigned */
     {"_Z10atomic_minPU3AS1Vjj", "aclspv.atomic_umin"},
-    {"_Z10atomic_maxPU3AS1Vjj", "aclspv.atomic_umax"},
     {"_Z10atomic_minPU3AS3Vjj", "aclspv.atomic_umin"},
+    {"_Z10atomic_maxPU3AS1Vjj", "aclspv.atomic_umax"},
     {"_Z10atomic_maxPU3AS3Vjj", "aclspv.atomic_umax"},
 
-    /* atomic_and / atomic_or / atomic_xor */
     {"_Z10atomic_andPU3AS1Vii", "aclspv.atomic_and"},
-    {"_Z10atomic_orPU3AS1Vii",  "aclspv.atomic_or"},
-    {"_Z10atomic_xorPU3AS1Vii", "aclspv.atomic_xor"},
     {"_Z10atomic_andPU3AS3Vii", "aclspv.atomic_and"},
+    {"_Z10atomic_orPU3AS1Vii",  "aclspv.atomic_or"},
     {"_Z10atomic_orPU3AS3Vii",  "aclspv.atomic_or"},
+    {"_Z10atomic_xorPU3AS1Vii", "aclspv.atomic_xor"},
     {"_Z10atomic_xorPU3AS3Vii", "aclspv.atomic_xor"},
+
+    /* === Math builtins (common ones) === */
+    {"_Z3sinf", "aclspv.sin"},   {"sin",  "aclspv.sin"},
+    {"_Z3cosf", "aclspv.cos"},   {"cos",  "aclspv.cos"},
+    {"_Z4fabsf", "aclspv.fabs"}, {"fabs", "aclspv.fabs"},
+    {"_Z5sqrtf", "aclspv.sqrt"}, {"sqrt", "aclspv.sqrt"},
+    {"_Z3logf", "aclspv.log"},   {"log",  "aclspv.log"},
+    {"_Z4expf", "aclspv.exp"},   {"exp",  "aclspv.exp"},
+    {"_Z5powff", "aclspv.pow"},  {"pow",  "aclspv.pow"},
+
+    /* === Sub-group (optional but common) === */
+    {"_Z18get_sub_group_sizev", "aclspv.sub_group_size"},
+    {"_Z19get_sub_group_idv",   "aclspv.sub_group_id"},
+    {"_Z22get_sub_group_local_idv", "aclspv.sub_group_local_id"},
 };
 
 IMPL_PASS_RET aclspv_pass_emit_bltin_decl(
@@ -99,8 +135,8 @@ IMPL_PASS_RET aclspv_pass_emit_bltin_decl(
 	IGNORE(CTX);
 
 	while (i--) {
-		const char* ae2f_restrict const ocl_name = builtin_map[i].ocl_mangled_name;
-		const char* ae2f_restrict const internal_name = builtin_map[i].internal_name;
+		const char* ae2f_restrict const ocl_name = builtin_map[i].m_ocl_name;
+		const char* ae2f_restrict const m_internal_name = builtin_map[i].m_internal_name;
 		const LLVMValueRef ocl_func = LLVMGetNamedFunction(M, ocl_name);
 		LLVMTypeRef	func_type;
 		LLVMValueRef	internal_func;
@@ -119,10 +155,10 @@ IMPL_PASS_RET aclspv_pass_emit_bltin_decl(
 		assert(LLVMGetTypeKind(func_type) == LLVMFunctionTypeKind);
 
 		/** Get or insert the internal representation of the builtin function. */
-		internal_func = LLVMGetNamedFunction(M, internal_name);
+		internal_func = LLVMGetNamedFunction(M, m_internal_name);
 
 		if (!internal_func) {
-			internal_func = LLVMAddFunction(M, internal_name, func_type);
+			internal_func = LLVMAddFunction(M, m_internal_name, func_type);
 		} else {
 
 			/** Function already exists, ensure type matches. */

@@ -5,8 +5,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include <aclspv/argknd.h>
-#include <aclspv/md.h>
+#include "./argknd.h"
+#include "./md.h"
 
 typedef enum {
 	CHECK_WR_RECUR_GOOD,
