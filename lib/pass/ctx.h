@@ -7,7 +7,17 @@
 #include <ae2f/c90/StdBool.h>
 #include <ae2f/c90/StdInt.h>
 
+/** 
+ * @def		IMPL_PASS_RET 
+ * @brief	utility to setup pass definition
+ * */
 #define IMPL_PASS_RET	ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass
+
+/**
+ * @def		IGNORE
+ * @brief	ignore `x`
+ * */
+#define IGNORE(x)	(void)(x)
 
 typedef struct {
 	void* ae2f_restrict 	

@@ -59,6 +59,11 @@ ae2f_noexcept ACLSPV_ABI_IMPL e_aclspv_passes aclspv_runall_module_passes(
 		goto LBL_RET;
 	}
 
+	if((codepass = aclspv_pass_emit_bltin_decl(h_module, &ctx))) {
+		code = ACLSPV_PASSES_EMIT_BLTIN_DECL;
+		goto LBL_RET;
+	}
+
 LBL_RET:
 	_aclspv_stop_vec(aclspv_free, ctx.m_v0);
 	_aclspv_stop_vec(aclspv_free, ctx.m_v1);

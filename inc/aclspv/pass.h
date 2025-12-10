@@ -26,7 +26,10 @@ typedef enum {
 	FN_ACLSPV_PASS_ALLOC_FAILED,
 
 	/** @brief	finding argument kind has been failed. */
-	FN_ACLSPV_PASS_FAILED_FND_ARGKND
+	FN_ACLSPV_PASS_FAILED_FND_ARGKND,
+
+	/** @brief	met unexpected situation */
+	FN_ACLSPV_PASS_MET_INVAL
 } e_fn_aclspv_pass;
 
 /**
