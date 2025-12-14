@@ -58,20 +58,17 @@ aclspv_add_obj_to_lnker(
 	}
 
 	for(i = c_tars_len; i--;) {
-#if 1
 		if(LLVMLinkModules2(
 					(h_lnk)->m_module
 					, LLVMCloneModule(
 						aclspv_get_module_from_obj(
 							rd_hy_tars[i])
 						)
-
 				   ))
 		{
 			assert(ZSTR("ACLSPV_ADD_OBJ_TO_LNKER_FAILED"));
 			break;
 		}
-#endif
 	}
 
 	return i == ae2f_static_cast(size_t, -1L) ? 

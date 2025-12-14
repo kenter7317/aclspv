@@ -6,10 +6,12 @@
 #ifndef aclspv_lnker_h
 #define aclspv_lnker_h
 
-#include "./abi.h"
 #include <ae2f/Keys.h>
+#include <ae2f/c90/StdInt.h>
 
+#include "./abi.h"
 #include "./obj.h"
+#include "./pass.h"
 
 /** 
  * @class	x_aclspv_linker
@@ -86,5 +88,7 @@ aclspv_add_obj_to_lnker(
 		const h_aclspv_obj_t* ae2f_restrict const	rd_hy_tars,
 		const size_t					c_tars_len
 		);
+
+
 
 #endif

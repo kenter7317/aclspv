@@ -32,7 +32,10 @@ typedef enum {
 	FN_ACLSPV_PASS_MET_INVAL,
 
 	/** @brief	met the valid syntax but technically not supported. */
-	FN_ACLSPV_PASS_NO_SUPPORT
+	FN_ACLSPV_PASS_NO_SUPPORT,
+
+	/** @brief	met the situation where some values are too big */
+	FN_ACLSPV_PASS_TOO_BIG
 } e_fn_aclspv_pass;
 
 /**
@@ -45,6 +48,7 @@ typedef struct x_aclspv_pass_ctx a_aclspv_pass_ctx, * ae2f_restrict h_aclspv_pas
 /**
  * @typedef	fn_aclspv_pass_t
  * @brief	pass function
+ * @details	never try to invoke pass-el-like functions without configuring its arguments.
  * */
 typedef e_fn_aclspv_pass fn_aclspv_pass_t(const LLVMModuleRef, const h_aclspv_pass_ctx);
 
@@ -143,8 +147,44 @@ ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_ocl_bltin
 ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_pod_pshconst_args;
 
 /**
+ * @fn		aclspv_pass_alloc_descriptor
+ * @brief	Descriptor Allocation / Resource Binding
+ * @details	After argument analysis and clustering, this assigns actual Vulkan descriptor sets and bindings to non-POD arguments 
+ * 	> (images, samplers, storage buffers). 
+ *
+ * It often introduces resource variable functions or direct OpVariable handling. 	\n
+ * Without this, resources won't be bindable in Vulkan.
+ * */
+ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_alloc_descriptor;
+
+/**
+ * @fn		aclspv_pass_rep_ptr_bitcast
+ * @brief	Pointer bitcast replacement / rewriting / simplifying
+ * @details	Rewrites unsupported pointer bitcasts (e.g., between different address spaces or types) to Vulkan-legal forms.
+ * */
+ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_rep_ptr_bitcast;
+
+/**
+ * @fn		aclspv_pass_loc_mem
+ * @details	\n
+ * 	Collects all local allocas, 
+ * 	promotes them to function-scope globals in Workgroup address space, 
+ * 	and replaces uses (including GEPs).
+ *
+ *
+ * */
+ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_loc_mem;
+
+/**
+ * @fn		aclspv_pass_rewr_loc_ptr
+ * @brief	Local memory handling
+ * @details	Optional cleanup: handles any remaining pointer issues specific to local pointers (e.g., after bitcast replacement).
+ * */
+ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_rewr_loc_ptr;
+
+/**
  * @enum	e_aclspv_passes
- * @brief	the given number for passes
+ * @brief	the given number for passes/build step where error occurs
  * */
 typedef enum {
 	ACLSPV_PASSES_OK,
@@ -182,17 +222,36 @@ typedef enum {
 	ACLSPV_PASSES_LOWER_OCL_INTEL_SUBGRPS,
 
 	/** @brief error from `aclspv_pass_ocl_bltin_lower` */
-	ACLSPV_PASSES_OCL_BLTIN_LOWER
+	ACLSPV_PASSES_OCL_BLTIN_LOWER,
+
+	/** @brief error from `aclspv_pass_alloc_descriptor` */
+	ACLSPV_PASSES_ALLOC_DESCRIPTOR,
+
+	/** @brief error from `aclspv_pass_rep_ptr_bitcast` */
+	ACLSPV_PASSES_REP_PTR_BITCAST,
+
+	/** @brief error from `aclspv_pass_loc_mem` */
+	ACLSPV_PASSES_LOC_MEM,
+
+	/** @brief error from `aclspv_pass_rewr_loc_ptr` */
+	ACLSPV_PASSES_REWR_LOC_PTR,
+
+	/** @brief error from `aclspv_build_spv_emit` */
+	ACLSPV_PASSES_SPV_EMIT
 } e_aclspv_passes;
 
 
 /**
  * @fn		aclspv_runall_module_passes
  * @brief	run all passes for a module
- * @param	h_module	<HANDLE>	\n
- * a module to run passes
+ * @param	h_module	<HANDLE>		\n
+ * a valid module to run passes
  *
- * @param	wr_res_opt	<WR> <OPT>	\n
+ * @param	hrdwr_ctx_opt	<HANDLE> <RD> <WR> <OPT>\n
+ * a valid handle for allocator.			\n
+ * will be automatically generated when not given.
+ *
+ * @param	wr_res_opt	<WR> <OPT>		\n
  * When not null, 
  *
  * @return	\n
@@ -202,8 +261,8 @@ typedef enum {
 ae2f_extern ACLSPV_ABI_DECL
 e_aclspv_passes	aclspv_runall_module_passes(
 		const LLVMModuleRef		h_module, 
+		const h_aclspv_pass_ctx		hrdwr_ctx_opt,
 		e_fn_aclspv_pass* ae2f_restrict	const wr_res_opt
 		);
-
 
 #endif

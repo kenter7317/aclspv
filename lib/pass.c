@@ -14,16 +14,21 @@
 
 ae2f_noexcept ACLSPV_ABI_IMPL e_aclspv_passes aclspv_runall_module_passes(
 		const LLVMModuleRef			h_module, 
+		const h_aclspv_pass_ctx			hrdwr_ctx_opt,
 		e_fn_aclspv_pass* ae2f_restrict const	wr_res_opt
 		)
 {
 	e_fn_aclspv_pass	codepass	= FN_ACLSPV_PASS_OK;
 	e_aclspv_passes		code		= ACLSPV_PASSES_OK;
-	a_aclspv_pass_ctx	ctx;
+	struct x_aclspv_pass_ctx	ctx;
 
-	_aclspv_init_vec(ctx.m_v0);
-	_aclspv_init_vec(ctx.m_v1);
-	_aclspv_init_vec(ctx.m_v2);
+	if(hrdwr_ctx_opt) {
+		ctx = *hrdwr_ctx_opt;
+	} else {
+		_aclspv_init_vec(ctx.m_v0);
+		_aclspv_init_vec(ctx.m_v1);
+		_aclspv_init_vec(ctx.m_v2);
+	}
 
 	unless(h_module) {
 		assert(Z(FN_ACLSPV_PASS_MODULE_NIL));
@@ -87,20 +92,40 @@ ae2f_noexcept ACLSPV_ABI_IMPL e_aclspv_passes aclspv_runall_module_passes(
 		goto LBL_RET;
 	}
 
-#if 1
 	if((codepass = aclspv_pass_ocl_bltin_lower(h_module, &ctx))) {
 		code = ACLSPV_PASSES_OCL_BLTIN_LOWER;
 		goto LBL_RET;
 	}
-#endif
 
-	
+	if((codepass = aclspv_pass_alloc_descriptor(h_module, &ctx))) {
+		code = ACLSPV_PASSES_ALLOC_DESCRIPTOR;
+		goto LBL_RET;
+	}
+
+	if((codepass = aclspv_pass_rep_ptr_bitcast(h_module, &ctx))) {
+		code = ACLSPV_PASSES_REP_PTR_BITCAST;
+		goto LBL_RET;
+	}
+
+	if((codepass = aclspv_pass_loc_mem(h_module, &ctx))) {
+		code = ACLSPV_PASSES_LOC_MEM;
+		goto LBL_RET;
+	}
+
+	if((codepass = aclspv_pass_rewr_loc_ptr(h_module, &ctx))) {
+		code = ACLSPV_PASSES_REWR_LOC_PTR;
+		goto LBL_RET;
+	}
 
 LBL_RET:
-	_aclspv_stop_vec(aclspv_free, ctx.m_v0);
-	_aclspv_stop_vec(aclspv_free, ctx.m_v1);
-	_aclspv_stop_vec(aclspv_free, ctx.m_v2);
-
 	if(wr_res_opt) *wr_res_opt = codepass;
+	if(hrdwr_ctx_opt) {
+		*hrdwr_ctx_opt = ctx;
+	} else {
+		_aclspv_stop_vec(_aclspv_free, ctx.m_v0);
+		_aclspv_stop_vec(_aclspv_free, ctx.m_v1);
+		_aclspv_stop_vec(_aclspv_free, ctx.m_v2);
+	}
+
 	return code;
 }

@@ -85,6 +85,7 @@ int main(void) {
 		e_fn_aclspv_pass	pass_result;
 		pass_progress = aclspv_runall_module_passes(
 				lnk.m_module
+				, ae2f_NIL
 				, &pass_result
 				);
 
