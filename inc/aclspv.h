@@ -34,11 +34,6 @@ e_aclspv_init_global	aclspv_init_global(void);
 ae2f_extern ACLSPV_ABI_DECL
 void	aclspv_stop_global(void);
 
-/**
- * @typedef	aclspv_wrd_t
- * @brief	Word of spir-v as 32-bit unsigned integer.
- * */
-typedef uint32_t aclspv_wrd_t;
 
 #include "./aclspv/obj.h"
 #include <clang-c/Index.h>

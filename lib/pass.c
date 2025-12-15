@@ -1,12 +1,7 @@
 #include <aclspv/pass.h>
-
 #include <assert.h>
-
 #include "./pass/ctx.h"
-#include "./pass/md.h"
 
-
-#include <stdlib.h>
 
 #define aclspv_free(a, b)	free(a)
 
@@ -114,6 +109,11 @@ ae2f_noexcept ACLSPV_ABI_IMPL e_aclspv_passes aclspv_runall_module_passes(
 
 	if((codepass = aclspv_pass_rewr_loc_ptr(h_module, &ctx))) {
 		code = ACLSPV_PASSES_REWR_LOC_PTR;
+		goto LBL_RET;
+	}
+
+	if(hrdwr_ctx_opt && (codepass = aclspv_pass_mkspv(h_module, &ctx))) {
+		code = ACLSPV_PASSES_MKSPV;
 		goto LBL_RET;
 	}
 

@@ -39,12 +39,8 @@ typedef enum {
 
 	/** @brief	getting / fetching something has failed. */
 	FN_ACLSPV_PASS_GET_FAILED,
-	
-	/** @brief	emitting the spv has failed. `LLVMTargetMachineEmitToMemoryBuffer` */
-	FN_ACLSPV_PASS_SPV_EMIT_FAILED,
 
-	/** @brief	copying the emitted the spv has failed. */
-	FN_ACLSPV_PASS_SPV_COPY_FAILED
+	FN_ACLSPV_PASS_ERR_UNSPEC
 } e_fn_aclspv_pass;
 
 /**
@@ -192,6 +188,12 @@ ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_loc_mem;
 ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_rewr_loc_ptr;
 
 /**
+ * @fn		aclspv_pass_mkspv
+ * @brief	make final spir-v for vulkan
+ * */
+ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_mkspv;
+
+/**
  * @enum	e_aclspv_passes
  * @brief	the given number for passes/build step where error occurs
  * */
@@ -245,8 +247,8 @@ typedef enum {
 	/** @brief error from `aclspv_pass_rewr_loc_ptr` */
 	ACLSPV_PASSES_REWR_LOC_PTR,
 
-	/** @brief error from `aclspv_build_spv_emit` */
-	ACLSPV_PASSES_SPV_EMIT
+	/** @brief error from `aclspv_pass_mkspv` */
+	ACLSPV_PASSES_MKSPV
 } e_aclspv_passes;
 
 
