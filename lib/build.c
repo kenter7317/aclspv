@@ -5,9 +5,10 @@
 
 /**
  * @fn		aclspv_build_spv_emit
- * @brief	emit valid spir-v to `CTX_RET->m_v0`
+ * @brief	emit valid spir-v to `CTX_RET->m_v0` targetted for vulkan 1.0.
+ *
  * @param	M	Module
- * @param	CTX_RET	`CTX_RET->m_v0` will be considered as return value
+ * @param	CTX_RET	`CTX_RET->m_v0` will be considered as return value.
  * */
 ae2f_inline static e_fn_aclspv_pass aclspv_build_spv_emit(
 		const LLVMModuleRef	M,
@@ -94,6 +95,9 @@ END:
 
 #include <llvm-c/Target.h>
 #include <llvm-c/TargetMachine.h>
+#include "./pass/ctx.h"
+#include "./pass/md.h"
+#include "./pass/argknd.h"
 #include <assert.h>
 
 #define _free(a, b)
@@ -103,74 +107,23 @@ ae2f_inline static e_fn_aclspv_pass aclspv_build_spv_emit(
 		h_aclspv_pass_ctx	CTX_RET
 		)
 {
-	/** spirv64-unknown-unknown */
-#define TRIPLE	"spirv64-unknown-unknown"
+	/**
+	 * Make the spir-v targetted for vulkan 1.0
+	 * traverses the module, emits SPIR-V instructions
+	 * adds required capabilities, decorations (DescriptorSet, Binding, Block, etc.),
+	 * handles entry points, and outputs the binary.
+	 *
+	 * Current assumptions based on pipeline:
+	 * - All kernels are compute shaders (ExecutionModel GLCompute)
+	 * - DescriptorSet 0 for all resources
+	 * - Pipeline layout metadata attached via aclspv_pass_alloc_descriptor
+	 * - Argument kinds from arg_anal
+	 * - POD/push constants already handled
+	 * - No support yet for spec constants, subgroups beyond basic, etc.
+	 * */
 
-	LLVMTargetRef		target;
-	LLVMTargetMachineRef	machine;
-	LLVMMemoryBufferRef buffer;
+	IGNORE(M);
+	IGNORE(CTX_RET);
 
-	char* error = ae2f_NIL;
-	size_t		new_sz;
-
-	if (LLVMGetTargetFromTriple(
-				TRIPLE
-				, &target
-				, &error
-				)) 
-	{
-		/** TODO: log error */
-		LLVMDisposeMessage(error);
-		return FN_ACLSPV_PASS_GET_FAILED;
-	}
-
-	machine = LLVMCreateTargetMachine(
-			target, TRIPLE, "spirv", "",
-			LLVMCodeGenLevelDefault
-			, LLVMRelocDefault
-			, LLVMCodeModelDefault
-			);
-
-	unless (machine) {
-		return FN_ACLSPV_PASS_GET_FAILED;
-	}
-
-
-	if (LLVMTargetMachineEmitToMemoryBuffer(
-				machine, M, LLVMObjectFile
-				, &error, &buffer
-				)
-			)
-	{
-		/** TODO: log error */
-		LLVMDisposeMessage(error);
-		LLVMDisposeTargetMachine(machine);
-		return FN_ACLSPV_PASS_SPV_EMIT_FAILED;
-	}
-
-	new_sz = LLVMGetBufferSize(buffer);
-	unless(buffer) {
-		/** TODO: log error */
-		LLVMDisposeMessage(error);
-		LLVMDisposeTargetMachine(machine);
-		return FN_ACLSPV_PASS_SPV_EMIT_FAILED;
-	}
-
-	_aclspv_stop_vec(_aclspv_free, CTX_RET->m_v0);
-	_aclspv_init_vec(CTX_RET->m_v0);
-	_aclspv_grow_vec(malloc, _free, CTX_RET->m_v0, new_sz);
-
-	unless (CTX_RET->m_v0.m_p) {
-		LLVMDisposeMemoryBuffer(buffer);
-		LLVMDisposeTargetMachine(machine);
-		return FN_ACLSPV_PASS_SPV_COPY_FAILED;
-	}
-
-	memcpy(CTX_RET->m_v0.m_p, LLVMGetBufferStart(buffer), new_sz);
-	CTX_RET->m_v0.m_sz = new_sz;
-
-	LLVMDisposeMemoryBuffer(buffer);
-	LLVMDisposeTargetMachine(machine);
-
-	return FN_ACLSPV_PASS_OK;
+	return FN_ACLSPV_PASS_NO_SUPPORT;
 }
