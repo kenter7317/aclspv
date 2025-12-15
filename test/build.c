@@ -92,7 +92,7 @@ int main(void) {
 		}
 		else {
 			perror("aclspv_build has failed.");
-			assert(0);
+			assert(!(const char*)("ASSERT: aclspv_build has failed"));
 		}
 	}
 

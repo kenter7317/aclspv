@@ -1,4 +1,6 @@
 #include "./ctx.h"
+#include "./md.h"
+#include "./argknd.h"
 
 #include <ae2f/c90/StdInt.h>
 #include <ae2f/c90/StdBool.h>
@@ -10,6 +12,8 @@
 
 #include <spirv-tools/libspirv.h>
 #include <aclspv/spvty.h>
+
+#include <stdio.h>
 
 /** 
  * @def 	sz_to_count 
@@ -30,6 +34,16 @@
 #define get_wrd_of_vec(vec)	((aclspv_wrd_t* ae2f_restrict)((vec)->m_p))
 
 #define _free(a, b)	free(a)
+
+/** type id */
+typedef enum {
+	ID_DEFAULT_VOID = 1, 
+	ID_DEFAULT_FN_VOID,
+	ID_DEFAULT_INT32,
+	ID_DEFAULT_PTR_STORAGE,
+
+	ID_DEFAULT_END
+} e_id_default;
 
 /**
  * @fn		emit_wrd
@@ -102,18 +116,37 @@ IMPL_PASS_RET aclspv_pass_mkspv(
 {
 	size_t	ret_count = 5;
 	size_t	pos_tmp0;
+	unsigned	num_kernels;
+
+	const LLVMContextRef C = LLVMGetModuleContext(M);
+	const unsigned layout_md_id = C ? LLVMGetMDKindIDInContext(C, ACLSPV_MD_PIPELINE_LAYOUT,
+			sizeof(ACLSPV_MD_PIPELINE_LAYOUT)-1) : 0;
+
+	/** 
+	 * @var		tynxt_id 
+	 * @brief	next id
+	 * @details	use `next_id++` to get new id
+	 * */
+	aclspv_wrd_t next_id = ID_DEFAULT_END;
 
 	e_fn_aclspv_pass	status = FN_ACLSPV_PASS_OK;
 
 	assert(M);
 	assert(CTX);
 
+
 	/** header */
 	_aclspv_grow_vec(malloc, _free, CTX->m_ret, count_to_sz(5));
-	unless(CTX->m_ret.m_p) return FN_ACLSPV_PASS_ALLOC_FAILED;
+	unless(CTX->m_ret.m_p)
+		goto LBL_FNSTATISBAD;
 	unless((CTX->m_ret.m_sz) == count_to_sz(5)) {
 		status = FN_ACLSPV_PASS_MET_INVAL;
-		goto FNSTATISBAD;
+		goto LBL_FNSTATISBAD;
+	}
+	unless(C) goto LBL_FNSTATISBAD;
+	unless(layout_md_id) {
+		status = FN_ACLSPV_PASS_GET_FAILED;
+		goto LBL_FNSTATISBAD;
 	}
 
 	get_wrd_of_vec(&CTX->m_ret)[0] = SpvMagicNumber;
@@ -124,55 +157,218 @@ IMPL_PASS_RET aclspv_pass_mkspv(
 
 
 	unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpCapability, 1))) {
-		status = FN_ACLSPV_PASS_ALLOC_FAILED;
-		goto FNSTATISBAD;
+		goto LBL_FNSTATISBAD;
 	}
 
 	unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvCapabilityShader))) {
-		status = FN_ACLSPV_PASS_ALLOC_FAILED;
-		goto FNSTATISBAD;
+		goto LBL_FNSTATISBAD;
 	}
 
 	pos_tmp0 = ret_count;
 	unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpExtension, 0))) {
-		status = FN_ACLSPV_PASS_ALLOC_FAILED;
-		goto FNSTATISBAD;
+		goto LBL_FNSTATISBAD;
 	}
 
 	unless((ret_count = emit_str(&CTX->m_ret, ret_count, "SPV_KHR_storage_buffer_storage_class"))) {
-		status = FN_ACLSPV_PASS_ALLOC_FAILED;
-		goto FNSTATISBAD;
+		goto LBL_FNSTATISBAD;
 	}
 
 	set_oprnd_count_for_opcode(get_wrd_of_vec(&CTX->m_ret)[pos_tmp0], (aclspv_wrd_t)(ret_count - pos_tmp0 - 1));
 
 	unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpMemoryModel, 2))) {
-		status = FN_ACLSPV_PASS_ALLOC_FAILED;
-		goto FNSTATISBAD;
+		goto LBL_FNSTATISBAD;
 	}
 
 	unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvAddressingModelLogical))) {
-		status = FN_ACLSPV_PASS_ALLOC_FAILED;
-		goto FNSTATISBAD;
+		goto LBL_FNSTATISBAD;
 	}
 
 	unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvMemoryModelGLSL450))) {
-		status = FN_ACLSPV_PASS_ALLOC_FAILED;
-		goto FNSTATISBAD;
+		goto LBL_FNSTATISBAD;
 	}
 
+	/** OpTypeVoid */
+	unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpTypeVoid, 1))) 
+		goto LBL_FNSTATISBAD;
+	unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, ID_DEFAULT_VOID))) 
+		goto LBL_FNSTATISBAD;
 
-	goto FNSTATISGOOD;
 
-FNSTATISBAD:
+	/** OpTypeInt */
+	unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpTypeInt, 3))) 
+		goto LBL_FNSTATISBAD;
+	unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, ID_DEFAULT_INT32))) 
+		goto LBL_FNSTATISBAD;
+	unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, 32))) 
+		goto LBL_FNSTATISBAD;
+	unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, 1))) 
+		goto LBL_FNSTATISBAD;  /* signed */
+
+	/** OpTypeFunction %void () */
+	unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpTypeFunction, 2)))
+		goto LBL_FNSTATISBAD;
+	unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, ID_DEFAULT_FN_VOID)))
+		goto LBL_FNSTATISBAD;
+	unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, ID_DEFAULT_VOID)))
+		goto LBL_FNSTATISBAD;
+
+	/** Storage Pointer */
+	unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpTypePointer, 3))) goto LBL_FNSTATISBAD;
+	unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, ID_DEFAULT_PTR_STORAGE))) goto LBL_FNSTATISBAD;
+	unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvStorageClassStorageBuffer))) goto LBL_FNSTATISBAD;
+	unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, ID_DEFAULT_INT32))) goto LBL_FNSTATISBAD;
+
+	{
+		unsigned i = 0;
+
+
+		{
+			LLVMValueRef	func;
+			for (func = LLVMGetFirstFunction(M); func; func = LLVMGetNextFunction(func)) {
+				if (LLVMGetMetadata(func, LLVMGetMDKindID(
+								ACLSPV_MD_PIPELINE_LAYOUT
+								, sizeof(ACLSPV_MD_PIPELINE_LAYOUT) - 1
+								))) {  /* Has pipelayout? → kernel */
+					i++;
+				}
+			}
+		}
+
+		unless (i) {
+			goto LBL_NO_KRNL;
+		}
+
+
+		_aclspv_grow_vec(_aclspv_malloc, _aclspv_free, CTX->m_v0, (size_t)(sizeof(LLVMValueRef) * i));
+		_aclspv_grow_vec(_aclspv_malloc, _aclspv_free, CTX->m_v1, count_to_sz(32));
+#define kernel_nodes	((LLVMValueRef* ae2f_restrict)CTX->m_v0.m_p)
+#define	interface_ids	((aclspv_wrd_t* ae2f_restrict)CTX->m_v1.m_p)
+
+		unless (kernel_nodes && interface_ids) {
+			goto LBL_FNSTATISBAD;
+		}
+
+		{
+			LLVMValueRef func;
+			i = 0;
+			for (func = LLVMGetFirstFunction(M); func; func = LLVMGetNextFunction(func)) {
+				if (LLVMGetMetadata(func, LLVMGetMDKindID(
+								ACLSPV_MD_PIPELINE_LAYOUT
+								, sizeof(ACLSPV_MD_PIPELINE_LAYOUT) - 1))
+
+						&& !strncmp(LLVMGetValueName(func), "__kernel_", sizeof("__kernel_") - 1)
+				   )
+				{
+					kernel_nodes[i++] = func;
+				}
+			}
+
+			num_kernels = i;
+#define	num_kernels	((const unsigned)num_kernels)
+		}
+
+		while(i--) {
+			const LLVMValueRef kernel_func = kernel_nodes[i];
+			const LLVMValueRef layout_md = LLVMGetMetadata(kernel_func, layout_md_id);
+			size_t	interface_count = 0;
+			int	num_tuples, t;
+
+			unless(layout_md) continue;
+			t = num_tuples = LLVMGetNumOperands(kernel_func);
+
+			while(t-- > 0) {
+				const LLVMValueRef tuple = LLVMGetOperand(layout_md, (unsigned)t);
+				uintmax_t	set, binding, arg_idx;
+
+#if		!defined(NDEBUG) || !NDEBUG
+				char	var_name[64];
+				size_t	name_pos;
+#endif
+
+				aclspv_wrd_t	var_id = next_id++;
+
+				if(!LLVMIsAMDNode(tuple) || LLVMGetNumOperands(tuple) != 4) continue;
+
+				set	= LLVMConstIntGetZExtValue(LLVMGetOperand(tuple, 0));
+				binding = LLVMConstIntGetZExtValue(LLVMGetOperand(tuple, 1));
+				arg_idx	= LLVMConstIntGetZExtValue(LLVMGetOperand(tuple, 2));
+
+				if(set > UINT32_MAX || binding > UINT32_MAX || arg_idx > UINT32_MAX)	{
+					status	= FN_ACLSPV_PASS_TOO_BIG;
+					goto LBL_FNSTATISBAD;
+				}
+
+#define set	((aclspv_wrd_t)set)
+#define binding	((aclspv_wrd_t)binding)
+#define	arg_idx	((aclspv_wrd_t)arg_idx)
+
+				/* OpVariable */
+				unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpVariable, 4))) goto LBL_FNSTATISBAD;
+				unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, ID_DEFAULT_PTR_STORAGE))) goto LBL_FNSTATISBAD;
+				unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, var_id))) goto LBL_FNSTATISBAD;
+				unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvStorageClassStorageBuffer))) goto LBL_FNSTATISBAD;
+				unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, 0))) goto LBL_FNSTATISBAD;
+
+				/* Decorations */
+				unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpDecorate, 3))) goto LBL_FNSTATISBAD;
+				unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, var_id))) goto LBL_FNSTATISBAD;
+				unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvDecorationDescriptorSet))) goto LBL_FNSTATISBAD;
+				unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, set))) goto LBL_FNSTATISBAD;
+
+				unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpDecorate, 3))) goto LBL_FNSTATISBAD;
+				unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, var_id))) goto LBL_FNSTATISBAD;
+				unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvDecorationBinding))) goto LBL_FNSTATISBAD;
+				unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, binding))) goto LBL_FNSTATISBAD;
+
+#undef	set
+#undef	binding
+#undef	arg_idx
+
+#if		!defined(NDEBUG) || !NDEBUG
+				snprintf(var_name, sizeof(var_name), "%s.arg%u", LLVMGetValueName(kernel_func), (uint32_t)arg_idx);
+				name_pos = ret_count;
+				unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpName, 0))) goto LBL_FNSTATISBAD;
+				unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, var_id))) goto LBL_FNSTATISBAD;
+				unless((ret_count = emit_str(&CTX->m_ret, ret_count, var_name))) goto LBL_FNSTATISBAD;
+				set_oprnd_count_for_opcode(get_wrd_of_vec(&CTX->m_ret)[name_pos], ret_count - name_pos - 1);
+#endif
+				interface_ids[interface_count++] = var_id;
+			}
+		}
+LBL_NO_KRNL:
+
+		for(i = num_kernels; i--; ) {
+			LLVMValueRef	kernel_func = kernel_nodes[i];
+			const char* ae2f_restrict	name = LLVMGetValueName(kernel_func);
+			const aclspv_wrd_t	func_id	= next_id++;
+
+			size_t entry_pos = ret_count;
+			unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpEntryPoint, 0))) goto LBL_FNSTATISBAD;
+			unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvExecutionModelGLCompute))) goto LBL_FNSTATISBAD;
+			unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, func_id))) goto LBL_FNSTATISBAD;
+			unless((ret_count = emit_str(&CTX->m_ret, ret_count, name))) goto LBL_FNSTATISBAD;
+
+			/* Add all collected interface IDs for this kernel */
+			/* You need to store per-kernel interface lists — use m_v2 or a struct array */
+
+			/* Placeholder: assume you saved them */
+			for (size_t j = 0; j < per_kernel_interface_count[k]; ++j) {
+				unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, per_kernel_interfaces[k][j]))) goto LBL_FNSTATISBAD;
+			}
+		}
+	}
+
+	goto LBL_FNSTATISGOOD;
+
+LBL_FNSTATISBAD:
 	_aclspv_stop_vec(_free, CTX->m_ret);
 	_aclspv_init_vec(CTX->m_ret);
 	return status;
 
-FNSTATISGOOD:
+LBL_FNSTATISGOOD:
 	if(CTX->m_ret.m_sz < count_to_sz(ret_count) || (ret_count) > (size_t)UINT32_MAX || !CTX->m_ret.m_p) {
 		status = FN_ACLSPV_PASS_TOO_BIG;
-		goto FNSTATISBAD;
+		goto LBL_FNSTATISBAD;
 	} else {
 		/** bound */
 		get_wrd_of_vec(&CTX->m_ret)[3] = ((aclspv_wrd_t)ret_count);
