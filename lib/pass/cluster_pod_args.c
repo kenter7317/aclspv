@@ -61,7 +61,7 @@ IMPL_PASS_RET aclspv_pass_cluster_pod_args(
 			kind_str = LLVMGetMDString(op, &len);
 			unless(kind_str) { ++i; continue; }
 
-			if (strncmp(kind_str, ACLSPV_ARGKND_POD, sizeof(ACLSPV_ARGKND_POD) - 1) == 0) {
+			if (strncmp(kind_str, ACLSPV_ARGKND_POD_PSHCONST, sizeof(ACLSPV_ARGKND_POD_PSHCONST) - 1) == 0) {
 				const unsigned cluster_start_idx = i;
 				unsigned cluster_count = 0;
 
@@ -78,7 +78,7 @@ IMPL_PASS_RET aclspv_pass_cluster_pod_args(
 					inner_kind_str  = LLVMGetMDString(inner_op, &len);
 					unless(inner_kind_str) break;
 
-					if (strncmp(inner_kind_str, ACLSPV_ARGKND_POD, sizeof(ACLSPV_ARGKND_POD) - 1) == 0) {
+					if (strncmp(inner_kind_str, ACLSPV_ARGKND_POD_PSHCONST, sizeof(ACLSPV_ARGKND_POD_PSHCONST) - 1) == 0) {
 						++cluster_count;
 					} else {
 						break;
