@@ -86,7 +86,7 @@ IMPL_PASS_RET aclspv_pass_default_layout(
 				continue;
 			}
 
-			str_md_val = LLVMGetOperand(arg_kind_md, 0);
+			str_md_val = LLVMGetOperand(arg_kind_md, arg_idx);
 			if (!str_md_val || !LLVMIsAMDString(str_md_val)) {
 				arg_idx++;
 				continue;

@@ -299,7 +299,7 @@ IMPL_PASS_RET aclspv_pass_mkspv(
 				const LLVMValueRef set_layout_node = LLVMGetOperand(set_layouts_node, (unsigned)i_set);
 				LLVMValueRef	set_num_val, bindings_node;
 				aclspv_wrd_t	set;
-				int	num_bindings, i_binding;
+				int	i_binding;
 
 				if (!set_layout_node || !LLVMIsAMDNode(set_layout_node) || LLVMGetNumOperands(set_layout_node) < 2) {
 					continue;
@@ -314,8 +314,7 @@ IMPL_PASS_RET aclspv_pass_mkspv(
 				}
 
 				/* Iterate over bindings */
-				num_bindings = LLVMGetNumOperands(bindings_node);
-				for (i_binding = 0; i_binding < num_bindings; ++i_binding) {
+				for (i_binding = LLVMGetNumOperands(bindings_node); i_binding-- > 0; ) {
 					const LLVMValueRef binding_node = LLVMGetOperand(bindings_node, (unsigned)i_binding);
 					LLVMValueRef	arg_idx_val, binding_val;
 					aclspv_wrd_t	arg_idx, binding;
