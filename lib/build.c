@@ -8,7 +8,6 @@
 #include <aclspv/pass.h>
 #include <aclspv/build.h>
 
-#include <stdio.h>
 
 ACLSPV_ABI_IMPL ae2f_retnew aclspv_wrd_t* aclspv_build(
 		h_aclspv_lnker_t			h_lnk,
@@ -78,7 +77,6 @@ ACLSPV_ABI_IMPL ae2f_retnew aclspv_wrd_t* aclspv_build(
 	}
 
 END:
-	printf("%p %u %u %u\n", (void*)contxt.m_ret.m_p, r_fn, r_wh, contxt.m_retcount);
 
 	_aclspv_stop_vec(_aclspv_free, contxt.m_scale_vars);
 	_aclspv_stop_vec(_aclspv_free, contxt.m_vecid_vars);
