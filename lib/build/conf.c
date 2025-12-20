@@ -34,9 +34,6 @@ ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass aclspv_build_conf(
 	CTX->m_count.m_entpdef		= 0;
 
 	/*** Shader Capability **/
-#if 0
-	_aclspv_grow_vec(_aclspv_malloc, _aclspv_free, wrd_caps, (size_t)sizeof(aclspv_wrd_t) * (size_t)3);
-#endif
 	assert(wrd_caps.m_p);
 
 	unless(wrd_caps_count = emit_opcode(&wrd_caps, 0, SpvOpCapability, 1))
