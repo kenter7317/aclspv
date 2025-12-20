@@ -7,14 +7,14 @@
 
 #define Z(a)	0
 
-ae2f_noexcept ACLSPV_ABI_IMPL e_aclspv_passes aclspv_runall_module_passes(
+ae2f_noexcept ACLSPV_ABI_IMPL aclspv_proc_t aclspv_runall_module_passes(
 		const LLVMModuleRef			h_module, 
 		const h_aclspv_pass_ctx			hrdwr_ctx_opt,
 		e_fn_aclspv_pass* ae2f_restrict const	wr_res_opt
 		)
 {
 	e_fn_aclspv_pass	codepass	= FN_ACLSPV_PASS_OK;
-	e_aclspv_passes		code		= ACLSPV_PASSES_OK;
+	aclspv_proc_t		code		= ACLSPV_PASSES_OK;
 	struct x_aclspv_pass_ctx	ctx;
 
 	if(hrdwr_ctx_opt) {
@@ -111,11 +111,6 @@ ae2f_noexcept ACLSPV_ABI_IMPL e_aclspv_passes aclspv_runall_module_passes(
 
 	if((codepass = aclspv_pass_rewr_loc_ptr(h_module, &ctx))) {
 		code = ACLSPV_PASSES_REWR_LOC_PTR;
-		goto LBL_RET;
-	}
-
-	if(hrdwr_ctx_opt && (codepass = aclspv_pass_mkspv(h_module, &ctx))) {
-		code = ACLSPV_PASSES_MKSPV;
 		goto LBL_RET;
 	}
 

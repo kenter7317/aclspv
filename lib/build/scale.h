@@ -7,7 +7,6 @@
 #define pass_scale_h
 
 #include "./ctx.h"
-#include <stdio.h> /* find debug */
 #include <assert.h>
 
 
@@ -98,8 +97,14 @@ ae2f_inline	static int_fast8_t grow_last_scale(
 		const size_t				c_newsize
 		)
 {
-	if(get_last_scale_from_vec(h_alloc)->m_nxt)
+
+	assert(h_alloc);
+	unless(h_alloc->m_p) {
+		assert(0);
 		return 1;
+	}
+
+	if(get_last_scale_from_vec(h_alloc)->m_nxt)	return 1;
 
 	_aclspv_grow_vec_with_copy(
 			_aclspv_malloc, _aclspv_free, _aclspv_memcpy
@@ -108,9 +113,11 @@ ae2f_inline	static int_fast8_t grow_last_scale(
 			, c_newsize + get_last_scale_from_vec(h_alloc)->m_buf
 			);
 
+	unless(h_alloc->m_p) return 1;
+
 	get_last_scale_from_vec(h_alloc)->m_sz = c_newsize;
 
-	return !h_alloc->m_p;
+	return !(h_alloc && h_alloc->m_p);
 }
 
 /**

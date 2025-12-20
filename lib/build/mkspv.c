@@ -1,7 +1,10 @@
-#include "./ctx.h"
-#include "./md.h"
-#include "./argknd.h"
-#include "./scale.h"
+#if 0
+
+#include "pass/md.h"
+#include "pass/argknd.h"
+
+
+#include <aclspv/build.h>
 
 #include <ae2f/c90/StdInt.h>
 #include <ae2f/c90/StdBool.h>
@@ -10,41 +13,14 @@
 #include <spirv/1.0/spirv.h>
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 
 #include <spirv-tools/libspirv.h>
 #include <aclspv/spvty.h>
 
-#include <stdio.h>
-
-/** 
- * @def 	sz_to_count 
- * @brief	byte size to word count
- * */
-#define sz_to_count(c_sz)	((size_t)(((size_t)(c_sz)) / ((size_t)sizeof(aclspv_wrd_t))))
-
-/**
- * @def		count_to_sz
- * @brief	word count to byte size
- * */
-#define count_to_sz(c_count)	((size_t)(((size_t)(c_count)) * (size_t)(sizeof(aclspv_wrd_t))))
-
-/**
- * @def		get_wrd_of_vec
- * @brief	get word buffer from vector
- * */
-#define get_wrd_of_vec(vec)	((aclspv_wrd_t* ae2f_restrict)((vec)->m_p))
-
-#define _free(a, b)	free(a)
-
-/** type id */
-typedef enum {
-	ID_DEFAULT_VOID = 1, 
-	ID_DEFAULT_FN_VOID,
-	ID_DEFAULT_INT32,
-	ID_DEFAULT_PTR_STORAGE,
-
-	ID_DEFAULT_END
-} e_id_default;
+#include "./wrdemit.h"
+#include "./scale.h"
+#include "./id.h"
 
 typedef struct {
 	aclspv_wrd_t	var_id;
@@ -56,43 +32,6 @@ typedef struct {
 	aclspv_wrd_t	ptr_struct_id;
 } s_var_info;
 
-/**
- * @fn		emit_wrd
- * @brief	try emitting `c_wrd` on `h_vec`
- * @return	new c_wrdcount available. 0 when failed allocating.
- * */
-static ae2f_inline size_t emit_wrd(x_aclspv_vec* ae2f_restrict const h_wrds, const size_t c_wrdcount, const aclspv_wrd_t c_wrd)
-{
-	if(count_to_sz(c_wrdcount + 1) > h_wrds->m_sz)
-		_aclspv_grow_vec_with_copy(
-				malloc, _free, _aclspv_memcpy 
-				, L_new, *h_wrds
-				, count_to_sz((c_wrdcount + 1) << 1)
-				);
-
-	unless(h_wrds->m_p) return 0;
-	if(count_to_sz(c_wrdcount) >= h_wrds->m_sz)
-		return 0;
-
-	get_wrd_of_vec(h_wrds)[c_wrdcount] = c_wrd;
-	return c_wrdcount + 1;
-}
-
-
-#define	mk_noprnds(c_num_opprm)	\
-	((((aclspv_wrd_t)((c_num_opprm) + 1)) << 16) & (aclspv_wrd_t)ACLSPV_MASK_NOPRNDS)
-
-#define	opcode_to_wrd(c_opcode, c_num_opprm)	\
-	((aclspv_wrd_t)(((aclspv_wrd_t)(c_opcode) & ACLSPV_MASK_OPCODE) | mk_noprnds(c_num_opprm)))
-/**
- * @def		emit_opcode
- * @brief	try emit opcode with num_opprm
- * */
-#define	emit_opcode(h_wrds, c_wrdcount, c_opcode, c_num_opprm_opt)	\
-	(emit_wrd(h_wrds, c_wrdcount, opcode_to_wrd(c_opcode, c_num_opprm_opt)))
-
-#define set_oprnd_count_for_opcode(cr_wrd, c_num_opprm)	\
-	(cr_wrd) = opcode_to_wrd((cr_wrd & ACLSPV_MASK_OPCODE), ((aclspv_num_opprm_t)(c_num_opprm)))
 
 
 typedef struct {
@@ -100,40 +39,13 @@ typedef struct {
 	LLVMValueRef	m_fn;
 } func_with_id;
 
-/**
- * @fn		emit_str
- * @brief	emit string with word size padded.
- * @returns	0 when failed.
- * */
-ae2f_inline static size_t emit_str(
-		x_aclspv_vec* ae2f_restrict const h_wrds, 
-		const size_t c_wrdcount, 
-		const char* ae2f_restrict const rd_str
-		)
-{
-	/** string len: null included. */
-	const size_t	len = strlen(rd_str) + 1;
-	const size_t	pad_wrds = (!!((len) & 3)) + ((len) >> 2);
-
-	_aclspv_grow_vec_with_copy(malloc, _free, _aclspv_memcpy, L_new
-			, *h_wrds, count_to_sz(pad_wrds + c_wrdcount));
-
-	unless(h_wrds->m_p) return 0;
-	assert(count_to_sz(pad_wrds + c_wrdcount) <= h_wrds->m_sz);
-
-	memset(&get_wrd_of_vec(h_wrds)[c_wrdcount], 0, count_to_sz(pad_wrds));
-	_aclspv_memcpy(&get_wrd_of_vec(h_wrds)[c_wrdcount], rd_str, len);
-
-	return c_wrdcount + pad_wrds;
-}
-
-IMPL_PASS_RET aclspv_pass_mkspv(
+IMPL_PASS_RET aclspv_build_mkspv(
 		const LLVMModuleRef	M,
 		const h_aclspv_pass_ctx	CTX
 		)
 {
-	size_t	ret_count = 5;
-	size_t	pos_tmp0;
+	spvsz_t	ret_count = 5;
+	spvsz_t	pos_tmp0;
 	unsigned	num_kernels;
 
 	const LLVMContextRef C = LLVMGetModuleContext(M);
@@ -214,7 +126,7 @@ IMPL_PASS_RET aclspv_pass_mkspv(
 				if (LLVMGetMetadata(func, LLVMGetMDKindID(
 								ACLSPV_MD_PIPELINE_LAYOUT
 								, sizeof(ACLSPV_MD_PIPELINE_LAYOUT) - 1
-								))) {  /* Has pipelayout? → kernel */
+								))) {  /* Has pipelayout? -> kernel */
 					i++;
 				}
 			}
@@ -351,7 +263,7 @@ LBL_NEXT_KRNL:
 			const char* ae2f_restrict	name = LLVMGetValueName(kernel_func);
 			const aclspv_wrd_t	func_id	= next_id++;
 			h_scale_t	scale = get_scale_from_vec(&CTX->m_v1, (size_t)i);
-			size_t entry_pos = ret_count;
+			spvsz_t entry_pos = ret_count;
 
 			kernel_nodes[i].m_id = func_id;
 
@@ -380,7 +292,6 @@ LBL_NEXT_KRNL:
 			unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, 1))) goto LBL_FNSTATISBAD;
 		}
 
-
 		/* OpName for function */
 #if !defined(NDEBUG) || !NDEBUG
 		for(i = num_kernels; i--; ) {
@@ -393,7 +304,6 @@ LBL_NEXT_KRNL:
 #endif
 
 		/** OpName for Decorators */
-
 #if		!defined(NDEBUG) || !NDEBUG
 		for(i = (unsigned)num_vars; i--; ) {
 			char	var_name[64];
@@ -434,9 +344,6 @@ LBL_NEXT_KRNL:
 			unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->var_id))) goto LBL_FNSTATISBAD;
 			unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvDecorationBinding))) goto LBL_FNSTATISBAD;
 			unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->binding))) goto LBL_FNSTATISBAD;
-
-			/** opname */
-
 		}
 
 		/* Emit types for variables */
@@ -520,7 +427,7 @@ LBL_FNSTATISBAD:
 
 LBL_FNSTATISGOOD:
 		assert(CTX->m_ret.m_p);
-		if(CTX->m_ret.m_sz < count_to_sz(ret_count) || (ret_count) > (size_t)UINT32_MAX || !CTX->m_ret.m_p) {
+		if(CTX->m_ret.m_sz < count_to_sz(ret_count) || !CTX->m_ret.m_p) {
 			status = FN_ACLSPV_PASS_TOO_BIG;
 			goto LBL_FNSTATISBAD;
 		} else {
@@ -532,3 +439,7 @@ LBL_FNSTATISGOOD:
 		return FN_ACLSPV_PASS_OK;
 	}
 }
+
+#endif
+
+extern int stub(void);

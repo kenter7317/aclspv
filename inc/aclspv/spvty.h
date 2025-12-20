@@ -54,5 +54,16 @@ extern char ACLSPV_CHECK[sizeof(aclspv_opcode_t) >= 2 ? 1 : -1];
  * */
 typedef aclspv_wrd_t	aclspv_num_opprm_t;
 
+/**
+ * @typedef	aclspv_wrdcount_t
+ * @brief	the integer type represents the number of word.
+ * */
+typedef	aclspv_wrd_t	aclspv_wrdcount_t;
+
+/**
+ * @typedef	aclpsv_id_t
+ * @brief	represents id in spir-v
+ * */
+typedef	aclspv_wrd_t	aclspv_id_t;
 
 #endif

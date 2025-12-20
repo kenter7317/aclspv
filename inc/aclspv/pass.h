@@ -188,12 +188,6 @@ ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_loc_mem;
 ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_rewr_loc_ptr;
 
 /**
- * @fn		aclspv_pass_mkspv
- * @brief	make final spir-v for vulkan
- * */
-ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_pass_t aclspv_pass_mkspv;
-
-/**
  * @enum	e_aclspv_passes
  * @brief	the given number for passes/build step where error occurs
  * */
@@ -247,10 +241,11 @@ typedef enum {
 	/** @brief error from `aclspv_pass_rewr_loc_ptr` */
 	ACLSPV_PASSES_REWR_LOC_PTR,
 
-	/** @brief error from `aclspv_pass_mkspv` */
-	ACLSPV_PASSES_MKSPV
+	/** @brief end of definition :: `e_aclspv_passes` */
+	ACLSPV_PASSES_EDENUM
 } e_aclspv_passes;
 
+typedef	unsigned aclspv_proc_t;
 
 /**
  * @fn		aclspv_runall_module_passes
@@ -270,7 +265,7 @@ typedef enum {
  * When not, the given number for a function will be returned.
  * */
 ae2f_extern ACLSPV_ABI_DECL
-e_aclspv_passes	aclspv_runall_module_passes(
+aclspv_proc_t	aclspv_runall_module_passes(
 		const LLVMModuleRef		h_module, 
 		const h_aclspv_pass_ctx		hrdwr_ctx_opt,
 		e_fn_aclspv_pass* ae2f_restrict	const wr_res_opt

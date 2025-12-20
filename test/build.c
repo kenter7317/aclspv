@@ -74,20 +74,19 @@ int main(void) {
 
 	{
 		e_fn_aclspv_pass	e_pass;
-		e_aclspv_build		e_build;
 		e_aclspv_passes		e_wh;
 		uintptr_t		count;
 		uint32_t* ae2f_restrict	const spv = aclspv_build(
-				&lnk, &e_build
+				&lnk
 				, &e_pass, &e_wh
 				, &count
 				);
 
-		printf("%p %u %u %u %lu\n", (void*)spv, e_pass, e_build, e_wh, count);
+		printf("%p %u %u %lu\n", (void*)spv, e_pass, e_wh, count);
 
 		if(spv) {
 			FILE* const file = fopen("result-build.spv", "wb");
-			fwrite(spv, sizeof(uint32_t), (size_t)count, file);
+			fwrite(spv, sizeof(uint32_t), (size_t)(count), file);
 			fclose(file);
 			free(spv);
 		}

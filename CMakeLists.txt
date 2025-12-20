@@ -90,6 +90,7 @@ target_link_libraries(${ae3f__aclspvCore__TENT} INTERFACE
 
 file(GLOB aclspv-src ${PROJECT_SOURCE_DIR}/lib/*)
 file(GLOB aclspv-src-pass ${PROJECT_SOURCE_DIR}/lib/pass/*)
+file(GLOB aclspv-src-build ${PROJECT_SOURCE_DIR}/lib/build/*)
 
 ae2f_Macro_LIB_V2(
 	ae3f aclspvABI_Pass	INTERFACE
@@ -104,10 +105,13 @@ ae2f_CoreLibTentConfigCustom(
 	aclspvABI ${ae2f_LIBPREFIX}
 	inc ae3f
 	${PROJECT_SOURCE_DIR}/cfg/aclspvABI.cmake.in
-	${aclspv-src} ${aclspv-inc} ${aclspv-src-pass}
+	${aclspv-src} ${aclspv-inc} 
+	${aclspv-src-pass}
+	${aclspv-src-build}
 	)
 
 target_link_libraries(${ae3f__aclspvABI__TENT} PUBLIC ae3f::aclspvCore)
+target_include_directories(${ae3f__aclspvABI__TENT} PRIVATE lib)
 
 llvm_map_components_to_libnames(LLVM_LIBS LLVMCore)
 target_link_libraries(${ae3f__aclspvABI__TENT} PUBLIC

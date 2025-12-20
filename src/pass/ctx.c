@@ -60,8 +60,10 @@ ae2f_MAC((f_malloc, f_free, f_memcpy, L_new, ))
 				L_new = f_malloc(c_new_sz);
 
 			if(L_new) {
-				f_memcpy(L_new, (rc_vec).m_p, (rc_vec).m_sz);
-				f_free((rc_vec).m_p, (rc_vec).m_sz);
+				if((rc_vec).m_p) {
+					f_memcpy(L_new, (rc_vec).m_p, (rc_vec).m_sz);
+					f_free((rc_vec).m_p, (rc_vec).m_sz);
+				}
 				(rc_vec).m_p = L_new;
 				(rc_vec).m_sz = (c_new_sz);
 			} else {
