@@ -117,7 +117,7 @@ ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_decl_bind(
 			return FN_ACLSPV_PASS_ALLOC_FAILED;
 		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->m_ptr_struct_id))) 
 			return FN_ACLSPV_PASS_ALLOC_FAILED;
-		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvStorageClassStorageBuffer))) 
+		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->m_storage_class))) 
 			return FN_ACLSPV_PASS_ALLOC_FAILED;
 		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->m_struct_id))) 
 			return FN_ACLSPV_PASS_ALLOC_FAILED;
@@ -134,7 +134,7 @@ ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_decl_bind(
 			return FN_ACLSPV_PASS_ALLOC_FAILED;
 		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->m_var_id))) 
 			return FN_ACLSPV_PASS_ALLOC_FAILED;
-		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvStorageClassStorageBuffer)))
+		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->m_storage_class)))
 			return FN_ACLSPV_PASS_ALLOC_FAILED;
 #undef	info
 	}

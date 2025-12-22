@@ -2,6 +2,9 @@
 #include <assert.h>
 
 #include <pass/md.h>
+#include <pass/argknd.h>
+
+#include <spirv/1.0/spirv.h>
 
 #include "./wrdemit.h"
 #include "./entp.h"
@@ -17,6 +20,8 @@ ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_fetch_bind(
 	const LLVMContextRef C = LLVMGetModuleContext(M);
 	const unsigned layout_md_id = LLVMGetMDKindIDInContext(C, ACLSPV_MD_PIPELINE_LAYOUT,
 			sizeof(ACLSPV_MD_PIPELINE_LAYOUT)-1);
+	const unsigned arg_kind_md_id = LLVMGetMDKindIDInContext(C, ACLSPV_MD_ARGKND,
+			sizeof(ACLSPV_MD_ARGKND)-1);
 
 	unsigned	num_vars = 0;
 
@@ -112,6 +117,31 @@ ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_fetch_bind(
 				assert(info->m_arg_idx == info->m_binding);
 				info->m_set = set;
 				info->m_entp_idx = i_fn;
+
+				/* Determine storage class based on argument kind */
+				{
+					const LLVMValueRef arg_kinds_node = LLVMGetMetadata(kernel.m_fn, arg_kind_md_id);
+					if (arg_kinds_node && LLVMGetMDNodeNumOperands(arg_kinds_node) > (unsigned)info->m_arg_idx) {
+						LLVMValueRef arg_kind_md = LLVMGetOperand(arg_kinds_node, (unsigned)info->m_arg_idx);
+						if (arg_kind_md) {
+							unsigned len;
+							const char* kind_str = LLVMGetMDString(arg_kind_md, &len);
+							if (kind_str) {
+								if (strcmp(kind_str, ACLSPV_ARGKND_BUFF_UBO) == 0) {
+									info->m_storage_class = SpvStorageClassUniform;
+								} else {
+									info->m_storage_class = SpvStorageClassStorageBuffer;
+								}
+							} else {
+								info->m_storage_class = SpvStorageClassStorageBuffer;
+							}
+						} else {
+							info->m_storage_class = SpvStorageClassStorageBuffer;
+						}
+					} else {
+						info->m_storage_class = SpvStorageClassStorageBuffer;
+					}
+				}
 
 				assert(CTX->m_scale_vars.m_p);
 

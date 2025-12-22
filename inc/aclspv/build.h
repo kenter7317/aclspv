@@ -36,6 +36,7 @@ ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_build_t aclspv_build_decl_en
  * */
 ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_build_t aclspv_build_fetch_bind;
 ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_build_t aclspv_build_decl_bind;
+ae2f_extern ACLSPV_ABI_DECL ae2f_noexcept fn_aclspv_build_t aclspv_build_decl_workgroup;
 
 /** 
  * @fn		aclspv_build_asm

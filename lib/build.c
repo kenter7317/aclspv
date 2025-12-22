@@ -71,6 +71,11 @@ ACLSPV_ABI_IMPL ae2f_retnew aclspv_wrd_t* aclspv_build(
 		goto END;
 	}
 
+	if((r_fn = aclspv_build_decl_workgroup(h_lnk->m_module, &contxt))) {
+		r_wh = ACLSPV_BUILDS_DECL_BIND;
+		goto END;
+	}
+
 	if((r_fn = aclspv_build_asm(h_lnk->m_module, &contxt))) {
 		r_wh = ACLSPV_BUILDS_ASM;
 		goto END;

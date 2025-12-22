@@ -11,8 +11,11 @@
 #include <stdlib.h>
 
 #define content0	\
-	"__kernel void __kernel_name_0(__global int* _glob1, __global int* _glob2) {"	\
-		"*(_glob1) = *(_glob2);"	\
+	"__kernel void __kernel_name_0(__global int* _glob1, __local int* _loc) {"	\
+		"*(_glob1) = *(_loc);"	\
+	"}"				\
+	"__kernel void __kernel_name_1(__local int* out, __constant int* asdf, __global const int* dd) {"	\
+			"*out = *(asdf) + *(dd);"									\
 	"}"
 
 #define content1	\
@@ -20,7 +23,7 @@
 	"int returnthree(void) { return 3; }" \
 	"unsigned int get_global_id(unsigned int dimindx);\n"	\
 	"unsigned int get_local_id(unsigned int dimindx);\n"	\
-	"__kernel void __kernel_name_1(__global float* f, __global int* _glob1, __global int* _glob2, const int _pushconstant) {"	\
+	"__kernel void __kernel_name_2(__global float* f, __global int* _glob1, __global int* _glob2, const int _pushconstant) {"	\
 		"(_glob1)[get_local_id(0)] = (_glob2)[get_global_id(0)] + _pushconstant;\n"	\
 		"*f = sin(3);"										\
 	"}"
