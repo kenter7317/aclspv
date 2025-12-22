@@ -49,6 +49,8 @@ IMPL_PASS_RET aclspv_pass_assgn_pipelayout(
 			, sizeof(ACLSPV_MD_PIPELINE_LAYOUT) - 1
 			);
 
+	const unsigned pc_offset_kind = LLVMGetMDKindIDInContext(C, ACLSPV_MD_PSHCONST_OFF, sizeof(ACLSPV_MD_PSHCONST_OFF) - 1);
+
 	unsigned i;
 
 	LLVMValueRef pc_ranges_node, set_layouts_node;
@@ -85,7 +87,12 @@ IMPL_PASS_RET aclspv_pass_assgn_pipelayout(
 
 
 			if (strcmp(kind_str, ACLSPV_ARGKND_POD_PSHCONST) == 0) {
-				push_constant_size += (uint32_t)LLVMStoreSizeOfType(TD, LLVMTypeOf(LLVMGetParam(F, i)));
+				const unsigned param_sz
+					= ((uint32_t)LLVMStoreSizeOfType(TD, LLVMTypeOf(LLVMGetParam(F, i)))) / 3 * 4;
+				const LLVMAttributeRef attr = LLVMCreateEnumAttribute(C, pc_offset_kind, push_constant_size);
+				LLVMAddAttributeAtIndex(F, i + 1, attr);
+
+				push_constant_size += param_sz;
 			} else if (strcmp(kind_str, ACLSPV_ARGKND_LOC) != 0) {
 				num_descriptors++;
 			}

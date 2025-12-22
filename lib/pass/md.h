@@ -33,12 +33,13 @@
  * */
 #define ACLSPV_MD_POD_CLUSTERS		"aclspv.pod_clusters"
 
+#define	ACLSPV_MD_PSHCONST_OFF		"aclspv.pshconst.off"
+
 /**
  * @def		ACLSPV_MD_OCL_KERNELS
  * @brief	opencl kernels, which needs to be removed.
  * */
 #define ACLSPV_MD_OCL_KERNELS		"opencl.kernels"
-
 
 
 #endif
