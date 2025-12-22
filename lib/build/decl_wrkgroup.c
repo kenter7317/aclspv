@@ -18,7 +18,7 @@
 
 #define	__vec			((lib_build_entp_t * ae2f_restrict)CTX->m_fnlist.m_entp.m_p)
 
-ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_decl_workgroup(
+ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_decl_wrkgroup(
 		const LLVMModuleRef		M,
 		const h_aclspv_build_ctx_t	CTX
 		)
