@@ -11,6 +11,7 @@
 #include "./bind.h"
 #include "./scale.h"
 #include "./id.h"
+#include "./constant.h"
 
 #define var_infos	((lib_build_bind* ae2f_restrict)CTX->m_vecid_vars.m_p)
 #define interface_ids_mgr	get_last_scale_from_vec(&CTX->m_scale_vars)
@@ -88,34 +89,19 @@ ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_decl_wrkgroup(
 					const char* kind_str = LLVMGetMDString(arg_kind_md, &len);
 					if (kind_str && strcmp(kind_str, ACLSPV_ARGKND_LOC) == 0) {
 						lib_build_bind* info = &var_infos[CTX->m_vecid_vars.m_sz / sizeof(lib_build_bind)];
-						aclspv_wrd_t ptr_type_id;
 						
 						/* Generate type for workgroup variable */
-						ptr_type_id = CTX->m_id++;
 						info->m_var_id = CTX->m_id++;
-						info->m_struct_id = ID_DEFAULT_INT32;  /* Use existing int type */
-						info->m_ptr_struct_id = ptr_type_id;
+						info->m_struct_id = lib_build_mk_constant_struct_id(1, CTX);  
+						info->m_ptr_struct_id = lib_build_mk_constant_ptr_work_id(1, CTX);
 						info->m_arg_idx = i_arg;
 						info->m_entp_idx = i_fn;
 						info->m_storage_class = SpvStorageClassWorkgroup;
 						
-						/* Use existing int32 type to avoid duplicates */
-						
-#define		ret_count	CTX->m_count.m_types
-#define		m_ret		m_section.m_types
+						unless(info->m_ptr_struct_id) return FN_ACLSPV_PASS_MET_INVAL;
+						unless(info->m_struct_id) return FN_ACLSPV_PASS_MET_INVAL;
 
-						/* OpTypePointer Workgroup */
-						unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpTypePointer, 3))) 
-							return FN_ACLSPV_PASS_ALLOC_FAILED;
-						unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, ptr_type_id))) 
-							return FN_ACLSPV_PASS_ALLOC_FAILED;
-						unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvStorageClassWorkgroup))) 
-							return FN_ACLSPV_PASS_ALLOC_FAILED;
-						unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, ID_DEFAULT_INT32))) 
-							return FN_ACLSPV_PASS_ALLOC_FAILED;
-
-#undef		ret_count
-#undef		m_ret
+#define	ptr_type_id	info->m_ptr_struct_id
 
 #define		ret_count	CTX->m_count.m_vars
 #define		m_ret		m_section.m_vars

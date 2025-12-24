@@ -36,7 +36,6 @@ ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_decl_bind(
 
 #define		ret_count	CTX->m_count.m_name
 #define		m_ret		m_section.m_name
-
 		name_pos = ret_count;
 		unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpName, 0))) 
 			return FN_ACLSPV_PASS_ALLOC_FAILED;
