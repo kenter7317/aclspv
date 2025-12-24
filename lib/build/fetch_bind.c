@@ -10,6 +10,7 @@
 #include "./entp.h"
 #include "./bind.h"
 #include "./scale.h"
+#include "./constant.h"
 
 ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_fetch_bind(
 		const LLVMModuleRef		M,
@@ -109,8 +110,8 @@ ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_fetch_bind(
 				binding_val = LLVMGetOperand(binding_node, 1);
 
 				info->m_var_id = CTX->m_id++;
-				info->m_struct_id = CTX->m_id++;
-				info->m_ptr_struct_id = CTX->m_id++;
+				info->m_struct_id = lib_build_mk_constant_struct_id(1, CTX);
+				unless(info->m_struct_id) return FN_ACLSPV_PASS_MET_INVAL;
 				info->m_arg_idx = (aclspv_wrd_t)LLVMConstIntGetZExtValue(arg_idx_val);
 				info->m_binding = (aclspv_wrd_t)LLVMConstIntGetZExtValue(binding_val);
 
@@ -129,17 +130,22 @@ ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_fetch_bind(
 							if (kind_str) {
 								if (strcmp(kind_str, ACLSPV_ARGKND_BUFF_UBO) == 0) {
 									info->m_storage_class = SpvStorageClassUniform;
+									info->m_ptr_struct_id = lib_build_mk_constant_ptr_uniform_id(1, CTX);
 								} else {
 									info->m_storage_class = SpvStorageClassStorageBuffer;
+									info->m_ptr_struct_id = lib_build_mk_constant_ptr_storage_id(1, CTX);
 								}
 							} else {
 								info->m_storage_class = SpvStorageClassStorageBuffer;
+								info->m_ptr_struct_id = lib_build_mk_constant_ptr_storage_id(1, CTX);
 							}
 						} else {
 							info->m_storage_class = SpvStorageClassStorageBuffer;
+							info->m_ptr_struct_id = lib_build_mk_constant_ptr_storage_id(1, CTX);
 						}
 					} else {
 						info->m_storage_class = SpvStorageClassStorageBuffer;
+						info->m_ptr_struct_id = lib_build_mk_constant_ptr_storage_id(1, CTX);
 					}
 				}
 

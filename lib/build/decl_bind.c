@@ -10,7 +10,6 @@
 #include "./entp.h"
 #include "./bind.h"
 #include "./scale.h"
-#include "./id.h"
 
 #define var_infos	((lib_build_bind* ae2f_restrict)CTX->m_vecid_vars.m_p)
 #define interface_ids_mgr	get_last_scale_from_vec(&CTX->m_scale_vars)
@@ -52,31 +51,6 @@ ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_decl_bind(
 	/* Emit decorations */
 	for (i = num_vars; i--; ) {
 #define	info	(&var_infos[i])
-#undef		ret_count
-#undef		m_ret
-
-#define		ret_count	CTX->m_count.m_decorate
-#define		m_ret		m_section.m_decorate
-
-		/* OpDecorate %struct Block */
-		unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpDecorate, 2))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->m_struct_id))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvDecorationBlock))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-
-		/* OpMemberDecorate */
-		unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpMemberDecorate, 4))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->m_struct_id))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, 0))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvDecorationOffset))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, 0))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
 
 		/** Decorations::Descriptorsets */
 		unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpDecorate, 3))) 
@@ -96,30 +70,6 @@ ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_decl_bind(
 		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, SpvDecorationBinding))) 
 			return FN_ACLSPV_PASS_ALLOC_FAILED;
 		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->m_binding))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-
-#undef		ret_count
-#undef		m_ret
-
-#define		ret_count	CTX->m_count.m_types
-#define		m_ret		m_section.m_types
-
-		/* OpTypeStruct */
-		unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpTypeStruct, 2))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->m_struct_id))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, ID_DEFAULT_INT32))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-
-		/* OpTypePointer */
-		unless((ret_count = emit_opcode(&CTX->m_ret, ret_count, SpvOpTypePointer, 3))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->m_ptr_struct_id))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->m_storage_class))) 
-			return FN_ACLSPV_PASS_ALLOC_FAILED;
-		unless((ret_count = emit_wrd(&CTX->m_ret, ret_count, info->m_struct_id))) 
 			return FN_ACLSPV_PASS_ALLOC_FAILED;
 
 #undef		ret_count

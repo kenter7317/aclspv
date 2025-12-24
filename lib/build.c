@@ -1,6 +1,5 @@
 #include "./ctx.h"
 #include "./build.h"
-#include "./build/wrdemit.h"
 #include "./build/scale.h"
 
 #include <string.h>
@@ -82,9 +81,9 @@ ACLSPV_ABI_IMPL ae2f_retnew aclspv_wrd_t* aclspv_build(
 	}
 
 END:
-
 	_aclspv_stop_vec(_aclspv_free, contxt.m_scale_vars);
 	_aclspv_stop_vec(_aclspv_free, contxt.m_vecid_vars);
+	_aclspv_stop_vec(_aclspv_free, contxt.m_constant_cache);
 
 	_aclspv_stop_vec(_aclspv_free, contxt.m_pass_ctx.m_v0);
 	_aclspv_stop_vec(_aclspv_free, contxt.m_pass_ctx.m_v1);

@@ -76,7 +76,12 @@ typedef struct a_aclspv_build_ctx {
 	x_aclspv_vec			m_ret;
 	x_aclspv_vec            m_scale_vars;
 	x_aclspv_vec            m_vecid_vars;
+
+	/** cache for elements related to unsigned integer constants [lib_build_constant] */
+	x_aclspv_vec		m_constant_cache;
 } x_aclspv_build_ctx;
+
+#define	_malloc_with_zero(a)	calloc(a, 1)
 
 /** OpCapability */
 #define	lib_build_ctx_section_capability(a)	((a).m_pass_ctx.m_v0)
