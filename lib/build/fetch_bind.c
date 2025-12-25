@@ -34,8 +34,6 @@ ACLSPV_ABI_IMPL ae2f_noexcept e_fn_aclspv_pass	aclspv_build_fetch_bind(
 		return FN_ACLSPV_PASS_MET_INVAL;
 	}
 
-	assert(CTX->m_fnlist.m_entp.m_p);
-
 	while(i_fn--) {
 #define	kernel	((lib_build_entp_t* ae2f_restrict)CTX->m_fnlist.m_entp.m_p)[i_fn]
 		const LLVMValueRef layout_md = LLVMGetMetadata(kernel.m_fn, layout_md_id);
