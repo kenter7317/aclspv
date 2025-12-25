@@ -21,6 +21,11 @@ typedef struct a_aclspv_build_ctx {
 	aclspv_id_t		m_id;
 
 	struct {
+		x_aclspv_vec 
+			m_v0;
+	}	m_tmp;
+
+	struct {
 		aclspv_wrdcount_t
 			m_capability,
 			m_ext,

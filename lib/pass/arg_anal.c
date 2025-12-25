@@ -155,6 +155,7 @@ IMPL_PASS_RET aclspv_pass_arg_anal(
 				const char* ae2f_restrict kind_str;
 				assert(j < nprms);
 				kind_str = get_arg_kind(prms[j], j);
+
 				unless(kind_str)
 					return FN_ACLSPV_PASS_FAILED_FND_ARGKND;
 

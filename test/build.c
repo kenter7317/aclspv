@@ -14,14 +14,14 @@
 	"__kernel void __kernel_name_0(__global int* _glob1, __local int* _loc) {"	\
 		"*(_glob1) = *(_loc);"	\
 	"}"				\
-	"__kernel void __kernel_name_1(__local int* out, __constant int* asdf, __global const int* dd) {"	\
+	"__kernel void __kernel_name_1(__local int* out, __constant int* asdf, int asdf_push, double asdf_push1, __global const int* dd) {"	\
 			"*out = *(asdf) + *(dd);"									\
 	"}"
 
 #define content1	\
 	"double sin(double);\n"	\
 	"int returnthree(void) { return 3; }\n" \
-	"#if 0\n"						\
+	"#if 1\n"						\
 	"unsigned int get_global_id(unsigned int dimindx);\n"	\
 	"unsigned int get_local_id(unsigned int dimindx);\n"	\
 	"__kernel void __kernel_name_2(__global float* f, __global int* _glob1, __global int* _glob2, const int _pushconstant, const float _pushconstant2) {"	\
@@ -38,12 +38,6 @@ int main(void) {
 	h_aclspv_obj_t		obj[2];
 	x_aclspv_lnker		lnk;
 
-	const char* args[] = {
-		"-std=CL1.2"
-	};
-
-	(void)args;
-
 
 	aclspv_init_global();
 	if(aclspv_init_lnker(&lnk)) {
@@ -52,22 +46,22 @@ int main(void) {
 
 	files[0].Contents = content0;
 	files[0].Filename = "main.cl";
-	files[0].Length = sizeof(content0);
+	files[0].Length = sizeof(content0) - 1;
 
 	files[1].Contents = content1;
 	files[1].Filename = "_main.cl";
-	files[1].Length = sizeof(content1);
+	files[1].Length = sizeof(content1) - 1;
 
 	obj[0] = aclspv_compile(
 			"main.cl"
 			, files, 1
-			, args, 1
+			, ae2f_NIL, 0
 			);
 
 	obj[1] = aclspv_compile(
 			"_main.cl"
 			, files + 1, 1
-			, args, 1
+			, ae2f_NIL, 0
 			);
 
 	assert(obj[0]);

@@ -100,6 +100,8 @@ END:
 	_aclspv_stop_vec(_aclspv_free, contxt.m_section.m_execmode);
 	_aclspv_stop_vec(_aclspv_free, contxt.m_section.m_types);
 
+	_aclspv_stop_vec(_aclspv_free, contxt.m_tmp.m_v0);
+
 	if(wr_pass_wh_opt) {
 		*wr_pass_wh_opt = r_wh;
 	}

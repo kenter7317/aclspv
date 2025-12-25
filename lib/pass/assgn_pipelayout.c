@@ -85,8 +85,7 @@ IMPL_PASS_RET aclspv_pass_assgn_pipelayout(
 			unsigned len;
 			const char* ae2f_restrict const kind_str = LLVMGetMDString(op, &len);
 
-
-			if (strcmp(kind_str, ACLSPV_ARGKND_POD_PSHCONST) == 0) {
+			if (strncmp(kind_str, ACLSPV_ARGKND_POD_PSHCONST, sizeof(ACLSPV_ARGKND_POD_PSHCONST) - 1) == 0) {
 				const unsigned param_sz
 					= ((uint32_t)LLVMStoreSizeOfType(TD, LLVMTypeOf(LLVMGetParam(F, i)))) / 3 * 4;
 				const LLVMAttributeRef attr = LLVMCreateEnumAttribute(C, pc_offset_kind, push_constant_size);
@@ -101,7 +100,12 @@ IMPL_PASS_RET aclspv_pass_assgn_pipelayout(
 		/** Create Push Constant Range Metadata */
 
 		if (push_constant_size > 0) {
-			LLVMValueRef pc_range_ops[3], pc_range_node;
+			LLVMValueRef pc_range_ops[3]
+#if 0
+				, pc_range_node;
+#else
+			;
+#endif
 
 			pc_range_ops[0] = LLVMConstInt(
 					LLVMInt32TypeInContext(C)
@@ -112,8 +116,12 @@ IMPL_PASS_RET aclspv_pass_assgn_pipelayout(
 			pc_range_ops[1] = (LLVMConstInt(LLVMInt32TypeInContext(C), 0, 0)); 
 			pc_range_ops[2] = (LLVMConstInt(LLVMInt32TypeInContext(C), push_constant_size, 0));
 
-			pc_range_node = LLVMMDNodeInContext(C, pc_range_ops, 3);
-			pc_ranges_node = LLVMMDNodeInContext(C, &pc_range_node, 1);
+#if 0
+			pc_range_nodes = LLVMMDNodeInContext(C, pc_range_ops, 3);
+			pc_ranges_node = LLVMMDNodeInContext(C, &pc_range_nodes, 1);
+#else
+			pc_ranges_node = LLVMMDNodeInContext(C, pc_range_ops, 3);
+#endif
 		} else {
 			pc_ranges_node = LLVMMDNodeInContext(C, ae2f_NIL, 0);
 		}
@@ -175,6 +183,9 @@ IMPL_PASS_RET aclspv_pass_assgn_pipelayout(
 			LLVMValueRef layout_ops[2];
 			layout_ops[0] = pc_ranges_node;
 			layout_ops[1] = set_layouts_node;
+
+			unless(pc_ranges_node) return FN_ACLSPV_PASS_GET_FAILED;
+			unless(set_layouts_node) return FN_ACLSPV_PASS_GET_FAILED;
 
 			LLVMGlobalSetMetadata(F, pipelayout_md_id, LLVMValueAsMetadata(LLVMMDNodeInContext(C, layout_ops, 2)));
 		}
