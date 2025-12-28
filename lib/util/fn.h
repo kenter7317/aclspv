@@ -2,16 +2,17 @@
 #define lib_build_fn_h
 
 #include <aclspv/spvty.h>
-#include <llvm-c/Core.h>
+#include <clang-c/Index.h>
 
 typedef struct {
 	/* @brief Result ID for function */
-	aclspv_id_t       m_id;
+	aclspv_id_t	m_id;
+
 	/* @brief OpTypeFunction ID */
-	aclspv_id_t       m_type_id;
+	aclspv_id_t	m_type_id;
 
 	/* @brief LLVM function reference */
-	LLVMValueRef      m_fn;
+	CXCursor	m_fn;
 } lib_build_fn_t;
 
 #endif

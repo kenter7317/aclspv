@@ -14,7 +14,7 @@
 #define	wrd_ext_count	h_ctx->m_count.m_ext
 
 ae2f_inline static e_aclspv_compile_t impl_conf(
-		const h_aclspv_build_ctx_t		h_ctx
+		const h_util_ctx_t		h_ctx
 		)
 {
 	assert(h_ctx);

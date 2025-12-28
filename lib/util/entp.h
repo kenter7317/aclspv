@@ -15,9 +15,7 @@ typedef struct {
 		aclspv_id_t m_arrsz;
 	} m_push_ids;
 
-#if 0
-	LLVMValueRef	m_fn;
-#endif
+	CXCursor	m_fn;
 } lib_build_entp_t;
 
 #endif

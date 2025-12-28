@@ -1,5 +1,5 @@
-#ifndef	lib_build_iddef_h
-#define lib_build_iddef_h
+#ifndef	util_iddef_h
+#define util_iddef_h
 
 #include <assert.h>
 
@@ -9,9 +9,9 @@
 
 #include <spirv/unified1/spirv.h>
 
-ae2f_inline static aclspv_id_t lib_build_get_default_id(
+ae2f_inline static aclspv_id_t util_get_default_id(
 		const e_id_default	c_id_default,
-		h_aclspv_build_ctx_t	h_ctx
+		h_util_ctx_t	h_ctx
 		) 
 {
 	assert(h_ctx);
@@ -49,7 +49,7 @@ ae2f_inline static aclspv_id_t lib_build_get_default_id(
 				return 0;
 			unless((ret_count = emit_wrd(&CTX->m_section.m_types, ret_count, 4)))
 				return 0;
-			unless(lib_build_get_default_id(ID_DEFAULT_U32, h_ctx))
+			unless(util_get_default_id(ID_DEFAULT_U32, h_ctx))
 				return 0;
 			break;
 

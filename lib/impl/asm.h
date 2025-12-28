@@ -6,7 +6,7 @@
 #include <util/wrdemit.h>
 
 ae2f_inline static ae2f_noexcept e_aclspv_compile_t impl_asm(
-		const h_aclspv_build_ctx_t	h_ctx
+		const h_util_ctx_t	h_ctx
 		)
 {
 	h_ctx->m_retcount

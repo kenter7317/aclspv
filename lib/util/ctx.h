@@ -3,11 +3,14 @@
 
 #include "../vec.auto.h"
 #include "./id.h"
+
+#include <aclspv.h>
 #include <aclspv/spvty.h>
 
 #define	_free(a, b)	free(a)
 
 typedef struct a_aclspv_ctx {
+	e_aclspv_compile_t	m_state;
 
 	/**
 	 * @var		m_ret
@@ -84,15 +87,17 @@ typedef struct a_aclspv_ctx {
 	 * @brief	fully emitted spir-v
 	 * */
 	x_aclspv_vec			m_ret;
+#if 0
 	x_aclspv_vec            m_scale_vars;
 	x_aclspv_vec            m_vecid_vars;
+#endif
 
 	/** cache for elements related to unsigned integer constants [lib_build_constant] */
 	x_aclspv_vec		m_constant_cache;
 } x_aclspv_ctx;
 
 typedef x_aclspv_ctx* ae2f_restrict h_aclspv_ctx_t;
-typedef h_aclspv_ctx_t h_aclspv_build_ctx_t;
+typedef h_aclspv_ctx_t h_util_ctx_t;
 
 #define	_malloc_with_zero(a)	calloc(a, 1)
 

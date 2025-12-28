@@ -3,10 +3,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define maincontent	\
-	"__kernel void __kernel_name(__global int* _glob1, __global int* _glob2) {"	\
-		"*(_glob1) = *(_glob2);"	\
-	"}"
+char maincontent[] =
+"struct STRUCTURE { int a; int b; };"
+"void N_KERNEL_0();"
+"__kernel void KERNEL_0(uint pushu32, __global uint* globu32, __local uint* locu32, float pushf32, struct STRUCTURE push_struct) { }"
+"void N_KERNEL_0() {}";
 
 int main(void) {
 	struct CXUnsavedFile	files[1];

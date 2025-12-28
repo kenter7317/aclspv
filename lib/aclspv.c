@@ -8,11 +8,14 @@
 #include "./impl/conf.h"
 
 #include "./util/ctx.h"
+#include "./util/entp.h"
+#include "./util/fn.h"
 
 #include <assert.h>
 #include <string.h>
 
-#include "./iter/root.h"
+#include "./emit/count_fn.h"
+#include "./emit/decl_glob_obj.h"
 
 
 /**
@@ -73,7 +76,22 @@ aclspv_compile(
 
 	CXROOTCUR = clang_getTranslationUnitCursor(CXTU);
 
-	clang_visitChildren(CXROOTCUR, iter_root, &CTX);
+	clang_visitChildren(CXROOTCUR, emit_count_fn, &CTX);
+	if((STATE_VAL = CTX.m_state))
+		goto LBL_CLEANUP;
+
+	_aclspv_grow_vec(_aclspv_malloc, _aclspv_free, CTX.m_fnlist.m_entp, (size_t)(sizeof(lib_build_entp_t) * CTX.m_fnlist.m_num_entp));
+	_aclspv_grow_vec(_aclspv_malloc, _aclspv_free, CTX.m_fnlist.m_fn, (size_t)(sizeof(lib_build_fn_t) * CTX.m_fnlist.m_num_fn));
+
+	CTX.m_fnlist.m_num_entp	= 0;
+	CTX.m_fnlist.m_num_fn	= 0;
+
+	clang_visitChildren(CXROOTCUR, emit_decl_glob_obj, &CTX);
+
+	if((STATE_VAL = CTX.m_state))
+		goto LBL_CLEANUP;
+
+	CTX.m_id += CTX.m_fnlist.m_num_entp + CTX.m_fnlist.m_num_fn;
 
 	if((STATE_VAL = impl_asm(&CTX)))
 		goto LBL_CLEANUP;
@@ -82,8 +100,6 @@ LBL_CLEANUP:
 
 	clang_disposeTranslationUnit(CXTU);
 	_aclspv_stop_vec(_aclspv_free, CTX.m_constant_cache);
-	_aclspv_stop_vec(_aclspv_free, CTX.m_scale_vars);
-	_aclspv_stop_vec(_aclspv_free, CTX.m_vecid_vars);
 
 	_aclspv_stop_vec(_aclspv_free, CTX.m_fnlist.m_entp);
 	_aclspv_stop_vec(_aclspv_free, CTX.m_fnlist.m_fn);
@@ -100,6 +116,7 @@ LBL_CLEANUP:
 	_aclspv_stop_vec(_aclspv_free, CTX.m_section.m_name);
 	_aclspv_stop_vec(_aclspv_free, CTX.m_section.m_types);
 	_aclspv_stop_vec(_aclspv_free, CTX.m_section.m_vars);
+
 
 	if(CXIDX) clang_disposeIndex(CXIDX);
 	if(rwr_cxerr_opt) *rwr_cxerr_opt = CXERR;
