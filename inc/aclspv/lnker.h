@@ -11,7 +11,6 @@
 
 #include "./abi.h"
 #include "./obj.h"
-#include "./pass.h"
 
 /** 
  * @class	x_aclspv_linker

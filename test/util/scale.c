@@ -1,5 +1,5 @@
-#include "../../lib/pass/ctx.auto.h"
-#include "../../lib/build/scale.h"
+#include "../../lib/vec.auto.h"
+#include "../../lib/util/scale.h"
 #include <assert.h>
 
 int main(void) {

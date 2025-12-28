@@ -6,7 +6,7 @@
 #ifndef aclspv_obj_h
 #define aclspv_obj_h
 
-#include <llvm-c/Core.h>
+#include <clang-c/Index.h>
 #include "./abi.h"
 #include <ae2f/Keys.h>
 #include <ae2f/LangVer.h>
@@ -28,43 +28,12 @@ typedef struct x_aclspv_obj x_aclspv_obj;
 			"e-p:64:64-p1:64:64-p2:64:64-p3:64:64-p4:64:64-"	\
 			"i64:64-i128:128-n8:16:32:64"
 
-#if ae2f_stdcc_v
-#include <llvm/IR/Module.h>
-#include <clang/CodeGen/CodeGenAction.h>
-#include <memory>
 #include <assert.h>
 
 struct x_aclspv_obj {
-	std::unique_ptr<llvm::LLVMContext>	m_modctx;
-	std::unique_ptr<clang::EmitLLVMAction>	m_act;
-	std::unique_ptr<llvm::Module>		m_module;
-	inline x_aclspv_obj(
-			std::unique_ptr<llvm::LLVMContext>&& s_modctx,
-			std::unique_ptr<clang::EmitLLVMAction>&& s_act
-			) : 
-		m_modctx(std::move(s_modctx)),
-		m_act(std::move(s_act)),
-		m_module(this->m_act ? std::move(this->m_act->takeModule()) : ae2f_NIL)
-	{
-		/** validations */
-		assert(this->m_modctx);
-		assert(this->m_act);
-		assert(this->m_module);
-
-		LLVMSetDataLayout(
-				ae2f_reinterpret_cast(LLVMModuleRef, (this)->m_module.get())
-				, ACLSPV_OBJ_DATA_LAYOUT_DEFAULT
-				);
-	}
-
-	inline ~x_aclspv_obj() {
-		m_module.reset();
-		m_act.reset();
-		m_modctx.reset();
-	}
+	CXTranslationUnit	m_tu;
 };
 
-#endif
 
 /** 
  * @class	h_aclspv_obj_t

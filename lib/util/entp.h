@@ -2,7 +2,7 @@
 #define __lib_build_entp
 
 #include <aclspv/spvty.h>
-#include <llvm-c/Core.h>
+#include <clang-c/Index.h>
 
 typedef struct {
 	aclspv_id_t	m_id;
@@ -15,7 +15,9 @@ typedef struct {
 		aclspv_id_t m_arrsz;
 	} m_push_ids;
 
+#if 0
 	LLVMValueRef	m_fn;
+#endif
 } lib_build_entp_t;
 
 #endif

@@ -72,7 +72,7 @@ ae2f_Macro_init(1 30 30)
 ae2f_Macro_Lib_V2(
 	ae3f aclspvCore INTERFACE
 	${PROJECT_SOURCE_DIR}/src/ "__NOTHING"
-	${PROJECT_SOURCE_DIR}/src/ "*.def.c*"
+	${PROJECT_SOURCE_DIR}/src/ "*.c*"
 	${PROJECT_SOURCE_DIR}/lib/ ".auto.h"
 	${PROJECT_SOURCE_DIR}/cfg/aclspvCore.cmake.in
 	inc ${_aclspv_RELOADED}
@@ -88,17 +88,7 @@ target_link_libraries(${ae3f__aclspvCore__TENT} INTERFACE
 
 
 file(GLOB aclspv-src ${PROJECT_SOURCE_DIR}/lib/*)
-file(GLOB aclspv-src-pass ${PROJECT_SOURCE_DIR}/lib/pass/*)
-file(GLOB aclspv-src-build ${PROJECT_SOURCE_DIR}/lib/build/*)
-
-ae2f_Macro_LIB_V2(
-	ae3f aclspvABI_Pass	INTERFACE
-	${PROJECT_SOURCE_DIR}/src/	"__NOTHING"
-	${PROJECT_SOURCE_DIR}/src/pass	"*.c"
-	${PROJECT_SOURCE_DIR}/lib/pass	".auto.h"
-	${PROJECT_SOURCE_DIR}/cfg/aclspvABI_Pass.cmake.in
-	lib/pass/	${_aclspv_RELOADED}
-	)
+file(GLOB aclspv-src-build ${PROJECT_SOURCE_DIR}/lib/build/*.tar.c)
 
 ae2f_CoreLibTentConfigCustom(
 	aclspvABI ${ae2f_LIBPREFIX}
@@ -113,17 +103,10 @@ target_link_libraries(${ae3f__aclspvABI__TENT} PUBLIC ae3f::aclspvCore)
 target_include_directories(${ae3f__aclspvABI__TENT} PRIVATE lib)
 
 llvm_map_components_to_libnames(LLVM_LIBS LLVMCore)
-target_link_libraries(${ae3f__aclspvABI__TENT} PUBLIC
-	clang	LLVM clang-cpp
-	)
+target_link_libraries(${ae3f__aclspvABI__TENT} PUBLIC libclang)
 
 ae2f_CoreTestTentVerbose(${ae3f__aclspvABI__TENT} ./test/lifespan)
-ae2f_CoreTestTentVerbose(${ae3f__aclspvABI__TENT} ./test/stupid)
 ae2f_CoreTestTentVerbose(${ae3f__aclspvABI__TENT} ./test/util)
-ae2f_CoreTestTentVerbose(${ae3f__aclspvABI__TENT} ./test)
 
 ae2f_UltraErrWERROR(${ae3f__aclspvABI__TENT} PRIVATE)
-
-add_executable(dummy main.cc)
-target_link_libraries(dummy ae3f::aclspvABI)
 

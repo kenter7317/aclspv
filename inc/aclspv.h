@@ -10,47 +10,31 @@
 #include <ae2f/cc.h>
 
 #include "./aclspv/abi.h"
-#include <ae2f/c90/StdInt.h>
+#include "./aclspv/spvty.h"
 
-/**
- * @enum	e_aclspv_init_global
- * @brief	result value for `aclspv_init_global`
- * */
-typedef enum {
-	ACLSPV_INIT_GLOBAL_OK
-} e_aclspv_init_global;
-
-/**
- * @fn	aclspv_init_global
- * @brief	initialise the library's global state
- * */
-ae2f_extern ACLSPV_ABI_DECL
-e_aclspv_init_global	aclspv_init_global(void);
-
-/**
- * @fn	aclspv_stop_global
- * @brief	stops the library's global state
- * */
-ae2f_extern ACLSPV_ABI_DECL
-void	aclspv_stop_global(void);
-
-
-#include "./aclspv/obj.h"
 #include <clang-c/Index.h>
+
+typedef enum {
+	ACLSPV_COMPILE_OK,
+	ACLSPV_COMPILE_ALLOC_FAILED,
+	ACLSPV_COMPILE_MET_INVAL,
+	ACLSPV_COMPILE_ERR_CLANG
+} e_aclspv_compile_t;
 
 /**
  * @fn	aclspv_compile
- * @brief	compile files and generate an object
+ * @brief	compile files and generate spir-v for vulkan
  * @returns	<INIT:aclspv_free_obj>
  * */
-ae2f_extern ACLSPV_ABI_DECL ae2f_retnew
-h_aclspv_obj_t	aclspv_compile(
-		const char* ae2f_restrict const	rd_srcpath,
-		const  struct CXUnsavedFile* ae2f_restrict const 	rd_unsaved,
-		const size_t						c_unsaved_len,
+ae2f_extern ACLSPV_ABI_DECL e_aclspv_compile_t 
+aclspv_compile(
+		struct CXUnsavedFile* ae2f_restrict const 	rdwr_unsaved,
+		const unsigned					c_unsaved_count,
 		const char* ae2f_restrict const * ae2f_restrict const	rd_argv_opt,
-		const size_t						c_argc
-		);
-
+		const int						c_argc,
+		aclspv_wrdcount_t* ae2f_restrict			rwr_output_count_opt,
+		aclspv_wrd_t* ae2f_restrict* ae2f_restrict		rwr_output,
+		enum CXErrorCode* ae2f_restrict				rwr_cxerr_opt
+	      );
 
 #endif

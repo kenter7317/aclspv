@@ -12,7 +12,7 @@ typedef struct {
 	aclspv_wrdcount_t	m_entp_idx;
 	aclspv_id_t		m_struct_id;
 	aclspv_id_t		m_ptr_struct_id;
-	aclspv_wrd_t		m_storage_class;  /* SpvStorageClass* */
+	aclspv_wrd_t		m_storage_class;  
 } lib_build_bind;
 
 #endif

@@ -4,15 +4,18 @@
 #include <ae2f/Keys.h>
 #include <aclspv/spvty.h>
 
-#include <llvm-c/Core.h>
-#include <llvm-c/Types.h>
-
-#include <build.h>
 #include <assert.h>
-#include <spirv/unified1/spirv.h>
-#include "./iddef.h"
-#include "build/constant.h"
 #include <limits.h>
+
+#include <spirv/unified1/spirv.h>
+
+#include "./iddef.h"
+#include "./constant.h"
+
+/**
+ * FIXME
+ * */
+#if 0
 
 /**
  * @brief	getting structure's size
@@ -216,6 +219,8 @@ static aclspv_wrd_t lib_build_fnctl_llvmtospv(LLVMValueRef fn) {
 
 	return CTL;
 }
+#endif
+
 #endif
 
 #endif

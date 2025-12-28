@@ -6,12 +6,12 @@
 #include <ae2f/Keys.h>
 #include <ae2f/Cast.h>
 
-#if	!__ae2f_MACRO_GENERATED
-
 typedef struct {
 	void* ae2f_restrict 	m_p;
 	size_t	m_sz;
 } x_aclspv_vec;
+
+#if	!__ae2f_MACRO_GENERATED
 
 void aclspv_init_vec(x_aclspv_vec);
 void aclspv_stop_vec(x_aclspv_vec);

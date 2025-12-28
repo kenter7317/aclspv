@@ -1,14 +1,13 @@
-#ifndef	__lib_build_h
-#define __lib_build_h
+#ifndef lib_build_ctx_h
+#define lib_build_ctx_h
 
-#include <aclspv/build.h>
-#include <pass/ctx.h>
-
-#include "./build/id.h"
+#include "../vec.auto.h"
+#include "./id.h"
+#include <aclspv/spvty.h>
 
 #define	_free(a, b)	free(a)
 
-typedef struct a_aclspv_build_ctx {
+typedef struct a_aclspv_ctx {
 
 	/**
 	 * @var		m_ret
@@ -68,6 +67,9 @@ typedef struct a_aclspv_build_ctx {
 	 * */
 	struct {
 		x_aclspv_vec
+			m_capability,
+			m_ext,
+			m_memmodel,
 			m_entp,
 			m_execmode,
 			m_name,
@@ -77,7 +79,6 @@ typedef struct a_aclspv_build_ctx {
 			m_entpdef;
 	}			m_section;
 
-	struct x_aclspv_pass_ctx	m_pass_ctx;
 	/**
 	 * @var		m_ret
 	 * @brief	fully emitted spir-v
@@ -88,17 +89,11 @@ typedef struct a_aclspv_build_ctx {
 
 	/** cache for elements related to unsigned integer constants [lib_build_constant] */
 	x_aclspv_vec		m_constant_cache;
-} x_aclspv_build_ctx;
+} x_aclspv_ctx;
+
+typedef x_aclspv_ctx* ae2f_restrict h_aclspv_ctx_t;
+typedef h_aclspv_ctx_t h_aclspv_build_ctx_t;
 
 #define	_malloc_with_zero(a)	calloc(a, 1)
-
-/** OpCapability */
-#define	lib_build_ctx_section_capability(a)	((a).m_pass_ctx.m_v0)
-
-/** OpExtension */
-#define	lib_build_ctx_section_ext(a)		((a).m_pass_ctx.m_v1)
-
-/** OpMemoryModel */
-#define	lib_build_ctx_section_memmodel(a)	((a).m_pass_ctx.m_v2)
 
 #endif

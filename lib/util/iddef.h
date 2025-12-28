@@ -1,10 +1,10 @@
 #ifndef	lib_build_iddef_h
 #define lib_build_iddef_h
 
-#include <build.h>
 #include <assert.h>
 
 #include "./id.h"
+#include "./ctx.h"
 #include "./wrdemit.h"
 
 #include <spirv/unified1/spirv.h>

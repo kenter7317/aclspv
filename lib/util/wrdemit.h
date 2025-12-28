@@ -7,10 +7,11 @@
 #include <ae2f/c90/StdInt.h>
 #include <ae2f/Keys.h>
 
-#include <pass/ctx.h>
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 
-#include "../build.h"
+#include "./ctx.h"
 
 /** size_t for spir-v format */
 typedef	aclspv_wrdcount_t	spvsz_t;
