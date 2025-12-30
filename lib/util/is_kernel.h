@@ -7,12 +7,12 @@
 #include <string.h>
 
 
-ae2f_inline static unsigned util_is_kernel(CXCursor cursor) {
-	if (clang_getCursorKind(cursor) != CXCursor_FunctionDecl)
+ae2f_inline static unsigned util_is_kernel(const CXCursor h_fndecl) {
+	if (clang_getCursorKind(h_fndecl) != CXCursor_FunctionDecl)
 		return 0;
 
-	CXSourceRange range = clang_getCursorExtent(cursor);
-	CXTranslationUnit tu = clang_Cursor_getTranslationUnit(cursor);
+	CXSourceRange range = clang_getCursorExtent(h_fndecl);
+	CXTranslationUnit tu = clang_Cursor_getTranslationUnit(h_fndecl);
 
 	CXToken *tokens = NULL;
 	unsigned nTokens = 0;

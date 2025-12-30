@@ -26,8 +26,12 @@ typedef struct a_aclspv_ctx {
 	aclspv_id_t		m_id_defaults[ID_DEFAULT_END];
 
 	struct {
-		x_aclspv_vec 
-			m_v0;
+		aclspv_wrd_t	m_w0;
+		aclspv_wrd_t	m_w1;
+		aclspv_wrd_t	m_w2;
+		aclspv_wrd_t	m_w3;
+
+		x_aclspv_vec	m_v0;
 	}	m_tmp;
 
 	struct {
@@ -86,9 +90,9 @@ typedef struct a_aclspv_ctx {
 	 * @var		m_ret
 	 * @brief	fully emitted spir-v
 	 * */
-	x_aclspv_vec			m_ret;
-#if 0
+	x_aclspv_vec		m_ret;
 	x_aclspv_vec            m_scale_vars;
+#if 1
 	x_aclspv_vec            m_vecid_vars;
 #endif
 

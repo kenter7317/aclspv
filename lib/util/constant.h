@@ -46,7 +46,7 @@ typedef util_constant* ae2f_restrict p_util_constant_t;
 
 ae2f_inline ae2f_ccpure static util_constant* util_get_constant_node(
 		const aclspv_wrdcount_t c_key, 
-		h_aclspv_build_ctx_t h_ctx
+		h_util_ctx_t h_ctx
 		)
 {
 	const aclspv_wrdcount_t	COUNT = (aclspv_wrdcount_t)(h_ctx->m_constant_cache.m_sz / (size_t)sizeof(util_constant));
@@ -78,7 +78,7 @@ ae2f_inline ae2f_ccpure static util_constant* util_get_constant_node(
 
 ae2f_inline static util_constant* util_mk_constant_node(
 		const aclspv_wrdcount_t	c_key,
-		h_aclspv_build_ctx_t h_ctx
+		h_util_ctx_t h_ctx
 		)
 {
 	const aclspv_wrdcount_t	COUNT = (aclspv_wrdcount_t)(h_ctx->m_constant_cache.m_sz / (size_t)sizeof(util_constant));
@@ -127,14 +127,14 @@ ae2f_inline static util_constant* util_mk_constant_node(
 #include <spirv/unified1/spirv.h>
 #include "./wrdemit.h"
 
-ae2f_inline static aclspv_id_t	util_mk_constant_val_id(const aclspv_wrd_t c_val, h_aclspv_build_ctx_t h_ctx)
+ae2f_inline static aclspv_id_t	util_mk_constant_val_id(const aclspv_wrd_t c_val, h_util_ctx_t h_ctx)
 {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_val, h_ctx);
 	unless(C) return 0;
 	unless(C->m_key == c_val) return 0;
 	if(C->m_const_val_id) return C->m_const_val_id;
 
-	unless(lib_build_get_default_id(ID_DEFAULT_U32, h_ctx))
+	unless(util_get_default_id(ID_DEFAULT_U32, h_ctx))
 		return 0;
 
 	/** OpConstant */
@@ -147,7 +147,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_val_id(const aclspv_wrd_t c_val,
 	return C->m_const_val_id;
 }
 
-ae2f_inline static aclspv_id_t	util_mk_constant_arr8_id(const aclspv_wrd_t c_arrcount, h_aclspv_build_ctx_t h_ctx)
+ae2f_inline static aclspv_id_t	util_mk_constant_arr8_id(const aclspv_wrd_t c_arrcount, h_util_ctx_t h_ctx)
 {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_arrcount, h_ctx);
 	unless(C) return 0;
@@ -156,7 +156,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_arr8_id(const aclspv_wrd_t c_arr
 		C->m_const_val_id = util_mk_constant_val_id(c_arrcount, h_ctx);
 
 	if(C->m_arr8_id) return C->m_arr8_id;
-	unless(lib_build_get_default_id(ID_DEFAULT_U8, h_ctx))
+	unless(util_get_default_id(ID_DEFAULT_U8, h_ctx))
 		return 0;
 	if(C->m_key == 1) return ID_DEFAULT_U8;
 
@@ -190,7 +190,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_arr8_id(const aclspv_wrd_t c_arr
 	return C->m_arr8_id;
 }
 
-ae2f_inline static aclspv_id_t	util_mk_constant_arr16_id(const aclspv_wrd_t c_arrcount, h_aclspv_build_ctx_t h_ctx)
+ae2f_inline static aclspv_id_t	util_mk_constant_arr16_id(const aclspv_wrd_t c_arrcount, h_util_ctx_t h_ctx)
 {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_arrcount, h_ctx);
 	unless(C) return 0;
@@ -199,7 +199,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_arr16_id(const aclspv_wrd_t c_ar
 		C->m_const_val_id = util_mk_constant_val_id(c_arrcount, h_ctx);
 
 	if(C->m_arr16_id) return C->m_arr16_id;
-	unless(lib_build_get_default_id(ID_DEFAULT_U16, h_ctx))
+	unless(util_get_default_id(ID_DEFAULT_U16, h_ctx))
 		return 0;
 	if(C->m_key == 1) return ID_DEFAULT_U16;
 
@@ -232,7 +232,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_arr16_id(const aclspv_wrd_t c_ar
 	return C->m_arr16_id;
 }
 
-ae2f_inline static aclspv_id_t	util_mk_constant_arr32_id(const aclspv_wrd_t c_arrcount, h_aclspv_build_ctx_t h_ctx)
+ae2f_inline static aclspv_id_t	util_mk_constant_arr32_id(const aclspv_wrd_t c_arrcount, h_util_ctx_t h_ctx)
 {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_arrcount, h_ctx);
 	unless(C) return 0;
@@ -241,7 +241,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_arr32_id(const aclspv_wrd_t c_ar
 		C->m_const_val_id = util_mk_constant_val_id(c_arrcount, h_ctx);
 
 	if(C->m_arr32_id) return C->m_arr32_id;
-	unless(lib_build_get_default_id(ID_DEFAULT_U32, h_ctx))
+	unless(util_get_default_id(ID_DEFAULT_U32, h_ctx))
 		return 0;
 	if(C->m_key == 1) return ID_DEFAULT_U32;
 
@@ -273,7 +273,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_arr32_id(const aclspv_wrd_t c_ar
 	return C->m_arr32_id;
 }
 
-ae2f_inline static aclspv_id_t	util_mk_constant_arr128_id(const aclspv_wrd_t c_arrcount, h_aclspv_build_ctx_t h_ctx)
+ae2f_inline static aclspv_id_t	util_mk_constant_arr128_id(const aclspv_wrd_t c_arrcount, h_util_ctx_t h_ctx)
 {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_arrcount, h_ctx);
 	unless(C) return 0;
@@ -282,7 +282,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_arr128_id(const aclspv_wrd_t c_a
 		C->m_const_val_id = util_mk_constant_val_id(c_arrcount, h_ctx);
 
 	if(C->m_arr128_id) return C->m_arr128_id;
-	unless(lib_build_get_default_id(ID_DEFAULT_U32_VEC4, h_ctx))
+	unless(util_get_default_id(ID_DEFAULT_U32_VEC4, h_ctx))
 		return 0;
 	if(C->m_key == 1) return ID_DEFAULT_U32_VEC4;
 
@@ -314,7 +314,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_arr128_id(const aclspv_wrd_t c_a
 	return C->m_arr128_id;
 }
 
-ae2f_inline static aclspv_id_t	util_mk_constant_struct_id(const aclspv_wrd_t c_wrdcount, h_aclspv_build_ctx_t h_ctx) {
+ae2f_inline static aclspv_id_t	util_mk_constant_struct_id(const aclspv_wrd_t c_wrdcount, h_util_ctx_t h_ctx) {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_wrdcount, h_ctx);
 	unless(C) return 0;
 	unless(C->m_key == c_wrdcount) return 0;
@@ -358,7 +358,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_struct_id(const aclspv_wrd_t c_w
 	return C->m_struct_id;
 }
 
-ae2f_inline static aclspv_id_t	util_mk_constant_struct128_id(const aclspv_wrd_t c_veccount, h_aclspv_build_ctx_t h_ctx) {
+ae2f_inline static aclspv_id_t	util_mk_constant_struct128_id(const aclspv_wrd_t c_veccount, h_util_ctx_t h_ctx) {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_veccount, h_ctx);
 	unless(C) return 0;
 	unless(C->m_key == c_veccount) return 0;
@@ -402,7 +402,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_struct128_id(const aclspv_wrd_t 
 	return C->m_struct_id;
 }
 
-ae2f_inline static aclspv_id_t	util_mk_constant_structpriv_id(const aclspv_wrd_t c_wrdcount, h_aclspv_build_ctx_t h_ctx) {
+ae2f_inline static aclspv_id_t	util_mk_constant_structpriv_id(const aclspv_wrd_t c_wrdcount, h_util_ctx_t h_ctx) {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_wrdcount, h_ctx);
 	unless(C) return 0;
 	unless(C->m_key == c_wrdcount) return 0;
@@ -423,7 +423,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_structpriv_id(const aclspv_wrd_t
 }
 
 
-ae2f_inline static aclspv_id_t	util_mk_constant_ptr_psh_id(const aclspv_wrd_t c_wrdcount, h_aclspv_build_ctx_t h_ctx) {
+ae2f_inline static aclspv_id_t	util_mk_constant_ptr_psh_id(const aclspv_wrd_t c_wrdcount, h_util_ctx_t h_ctx) {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_wrdcount, h_ctx);
 	unless(C) return 0;
 	unless(C->m_key == c_wrdcount) return 0;
@@ -446,7 +446,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_ptr_psh_id(const aclspv_wrd_t c_
 	return C->m_ptr_psh;
 }
 
-ae2f_inline static aclspv_id_t	util_mk_constant_ptr_storage_id(const aclspv_wrd_t c_wrdcount, h_aclspv_build_ctx_t h_ctx) {
+ae2f_inline static aclspv_id_t	util_mk_constant_ptr_storage_id(const aclspv_wrd_t c_wrdcount, h_util_ctx_t h_ctx) {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_wrdcount, h_ctx);
 	unless(C) return 0;
 	unless(C->m_key == c_wrdcount) return 0;
@@ -469,7 +469,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_ptr_storage_id(const aclspv_wrd_
 	return C->m_ptr_storage;
 }
 
-ae2f_inline static aclspv_id_t	util_mk_constant_ptr_id(const aclspv_wrd_t c_wrdcount, h_aclspv_build_ctx_t h_ctx) {
+ae2f_inline static aclspv_id_t	util_mk_constant_ptr_id(const aclspv_wrd_t c_wrdcount, h_util_ctx_t h_ctx) {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_wrdcount, h_ctx);
 
 	unless(C) return 0;
@@ -494,7 +494,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_ptr_id(const aclspv_wrd_t c_wrdc
 	return C->m_ptr;
 }
 
-ae2f_inline static aclspv_id_t	util_mk_constant_ptr_uniform_id(const aclspv_wrd_t c_wrdcount, h_aclspv_build_ctx_t h_ctx) {
+ae2f_inline static aclspv_id_t	util_mk_constant_ptr_uniform_id(const aclspv_wrd_t c_wrdcount, h_util_ctx_t h_ctx) {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_wrdcount, h_ctx);
 	unless(C) return 0;
 	unless(C->m_key == c_wrdcount) return 0;
@@ -517,7 +517,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_ptr_uniform_id(const aclspv_wrd_
 	return C->m_ptr_uniform;
 }
 
-ae2f_inline static aclspv_id_t	util_mk_constant_ptr_work_id(const aclspv_wrd_t c_wrdcount, h_aclspv_build_ctx_t h_ctx) {
+ae2f_inline static aclspv_id_t	util_mk_constant_ptr_work_id(const aclspv_wrd_t c_wrdcount, h_util_ctx_t h_ctx) {
 	util_constant* ae2f_restrict C = util_mk_constant_node(c_wrdcount, h_ctx);
 	unless(C) return 0;
 	unless(C->m_key == c_wrdcount) return 0;
@@ -541,7 +541,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_ptr_work_id(const aclspv_wrd_t c
 	return C->m_ptr_work;
 }
 
-ae2f_inline static aclspv_id_t	util_mk_constant_ptr_by_enum(const aclspv_wrd_t c_wrdcount, h_aclspv_build_ctx_t h_ctx, enum SpvStorageClass_ c_class) {
+ae2f_inline static aclspv_id_t	util_mk_constant_ptr_by_enum(const aclspv_wrd_t c_wrdcount, h_util_ctx_t h_ctx, enum SpvStorageClass_ c_class) {
 	switch((aclspv_wrd_t)c_class) {
 		case SpvStorageClassWorkgroup:
 			return util_mk_constant_ptr_work_id(c_wrdcount, h_ctx);

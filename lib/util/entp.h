@@ -16,6 +16,6 @@ typedef struct {
 	} m_push_ids;
 
 	CXCursor	m_fn;
-} lib_build_entp_t;
+} util_entp_t;
 
 #endif

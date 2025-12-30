@@ -1,5 +1,5 @@
-#ifndef __lib_build_bind_h
-#define __lib_build_bind_h
+#ifndef util_bind_h
+#define util_bind_h
 
 #include <aclspv/spvty.h>
 #include <llvm-c/Core.h>
@@ -12,7 +12,7 @@ typedef struct {
 	aclspv_wrdcount_t	m_entp_idx;
 	aclspv_id_t		m_struct_id;
 	aclspv_id_t		m_ptr_struct_id;
-	aclspv_wrd_t		m_storage_class;  
-} lib_build_bind;
+	aclspv_wrd_t		m_storage_class;
+} util_bind;
 
 #endif
