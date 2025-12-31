@@ -39,20 +39,6 @@ ae2f_inline static aclspv_id_t util_get_default_id(
 				return 0;
 			break;
 
-		case ID_DEFAULT_U32_VEC4:
-			/** OpTypeFunction %void () */
-			unless((ret_count = emit_opcode(&CTX->m_section.m_types, ret_count, SpvOpTypeVector, 3)))
-				return 0;
-			unless((ret_count = emit_wrd(&CTX->m_section.m_types, ret_count, ID_DEFAULT_U32_VEC4)))
-				return 0;
-			unless((ret_count = emit_wrd(&CTX->m_section.m_types, ret_count, ID_DEFAULT_U32)))
-				return 0;
-			unless((ret_count = emit_wrd(&CTX->m_section.m_types, ret_count, 4)))
-				return 0;
-			unless(util_get_default_id(ID_DEFAULT_U32, h_ctx))
-				return 0;
-			break;
-
 		case ID_DEFAULT_U32:
 			unless((ret_count = emit_opcode(
 							&CTX->m_section.m_types

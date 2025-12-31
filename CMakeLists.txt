@@ -78,6 +78,14 @@ ae2f_Macro_Lib_V2(
 	inc ${_aclspv_RELOADED}
 	)
 
+if(NOT ${_aclspv_RELOADED})
+	ae2f_FileRaw_init(1 100)
+	ae2f_FileRaw_Run_One(
+		${PROJECT_SOURCE_DIR}/src/source.cl 
+		${PROJECT_SOURCE_DIR}/test/lifespan/source.auto.h
+		)
+endif()
+
 target_link_libraries(${ae3f__aclspvCore__TENT} INTERFACE
 	ae2f::Core ae2f::Preproc
 	)

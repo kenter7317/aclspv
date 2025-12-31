@@ -15,6 +15,8 @@ typedef struct {
 	aclspv_id_t		m_arr16_id;
 	aclspv_id_t		m_arr32_id;
 
+	aclspv_id_t		m_vec32_id;
+
 	/** u32_vec4_id */
 	aclspv_id_t		m_arr128_id;
 
@@ -157,6 +159,32 @@ ae2f_inline static aclspv_id_t	util_mk_constant_val_id(const aclspv_wrd_t c_val,
 	return C->m_const_val_id;
 }
 
+ae2f_inline static aclspv_id_t	util_mk_constant_vec32_id(const aclspv_wrd_t c_val, h_util_ctx_t h_ctx)
+{
+	util_constant* ae2f_restrict const C = util_mk_constant_node(c_val, h_ctx);
+	unless(C) return 0;
+	unless(C->m_key == c_val) return 0;
+
+
+	if(C->m_vec32_id) return C->m_vec32_id;
+
+
+	unless(util_get_default_id(ID_DEFAULT_U32, h_ctx))
+		return 0;
+
+	if(c_val == 1) return ID_DEFAULT_U32;
+
+	/** OpTypeVector */
+	unless((h_ctx->m_count.m_types = emit_opcode(&h_ctx->m_section.m_types, h_ctx->m_count.m_types, SpvOpTypeVector, 3))) return 0;
+	unless((h_ctx->m_count.m_types = emit_wrd(&h_ctx->m_section.m_types, h_ctx->m_count.m_types, h_ctx->m_id))) return 0;
+	unless((h_ctx->m_count.m_types = emit_wrd(&h_ctx->m_section.m_types, h_ctx->m_count.m_types, ID_DEFAULT_U32))) return 0;
+	unless((h_ctx->m_count.m_types = emit_wrd(&h_ctx->m_section.m_types, h_ctx->m_count.m_types, c_val))) return 0;  
+
+	C->m_vec32_id = h_ctx->m_id++;
+
+	return C->m_vec32_id;
+}
+
 ae2f_inline static aclspv_id_t	util_mk_constant_arr8_id(const aclspv_wrd_t c_arrcount, h_util_ctx_t h_ctx)
 {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_arrcount, h_ctx);
@@ -285,21 +313,24 @@ ae2f_inline static aclspv_id_t	util_mk_constant_arr32_id(const aclspv_wrd_t c_ar
 
 ae2f_inline static aclspv_id_t	util_mk_constant_arr128_id(const aclspv_wrd_t c_arrcount, h_util_ctx_t h_ctx)
 {
-	util_constant* ae2f_restrict const C = util_mk_constant_node(c_arrcount, h_ctx);
-	unless(C) return 0;
-	unless(C->m_key == c_arrcount) return 0;
+	util_constant* ae2f_restrict const C	= util_mk_constant_node(c_arrcount, h_ctx);
+	const aclspv_id_t ID_U32V4	= util_mk_constant_vec32_id(4, h_ctx);
+
+	unless(C)			return 0;
+	unless(C->m_key == c_arrcount)	return 0;
+	unless(ID_U32V4)	return 0;
 	unless(C->m_const_val_id)
 		C->m_const_val_id = util_mk_constant_val_id(c_arrcount, h_ctx);
 
 	if(C->m_arr128_id) return C->m_arr128_id;
-	unless(util_get_default_id(ID_DEFAULT_U32_VEC4, h_ctx))
+	unless(util_get_default_id(ID_U32V4, h_ctx))
 		return 0;
-	if(C->m_key == 1) return ID_DEFAULT_U32_VEC4;
+	if(C->m_key == 1) return ID_U32V4;
 
 	/** OpArray */
 	unless((h_ctx->m_count.m_types = emit_opcode(&h_ctx->m_section.m_types, h_ctx->m_count.m_types, SpvOpTypeArray, 3))) return 0;
 	unless((h_ctx->m_count.m_types = emit_wrd(&h_ctx->m_section.m_types, h_ctx->m_count.m_types, h_ctx->m_id))) return 0;
-	unless((h_ctx->m_count.m_types = emit_wrd(&h_ctx->m_section.m_types, h_ctx->m_count.m_types, ID_DEFAULT_U32_VEC4))) return 0;
+	unless((h_ctx->m_count.m_types = emit_wrd(&h_ctx->m_section.m_types, h_ctx->m_count.m_types, ID_U32V4))) return 0;
 	unless((h_ctx->m_count.m_types = emit_wrd(&h_ctx->m_section.m_types, h_ctx->m_count.m_types, C->m_const_val_id))) return 0;
 
 	unless((h_ctx->m_count.m_decorate = emit_opcode(&h_ctx->m_section.m_decorate
@@ -328,8 +359,8 @@ ae2f_inline static aclspv_id_t	util_mk_constant_struct_id(const aclspv_wrd_t c_w
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_wrdcount, h_ctx);
 	unless(C) return 0;
 	unless(C->m_key == c_wrdcount) return 0;
-	unless(C->m_arr32_id && C->m_key > 1)
-		C->m_arr32_id = util_mk_constant_arr32_id(c_wrdcount, h_ctx);
+	unless(C->m_vec32_id && C->m_key > 1)
+		C->m_vec32_id = util_mk_constant_vec32_id(c_wrdcount, h_ctx);
 
 	if(C->m_struct_id) return C->m_struct_id;
 
@@ -338,7 +369,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_struct_id(const aclspv_wrd_t c_w
 	unless((h_ctx->m_count.m_types = emit_wrd(&h_ctx->m_section.m_types
 					, h_ctx->m_count.m_types, h_ctx->m_id))) return 0;
 	unless((h_ctx->m_count.m_types = emit_wrd(&h_ctx->m_section.m_types
-					, h_ctx->m_count.m_types, C->m_arr32_id))) return 0;
+					, h_ctx->m_count.m_types, C->m_vec32_id))) return 0;
 
 
 
@@ -369,55 +400,15 @@ ae2f_inline static aclspv_id_t	util_mk_constant_struct_id(const aclspv_wrd_t c_w
 }
 
 ae2f_inline static aclspv_id_t	util_mk_constant_struct128_id(const aclspv_wrd_t c_veccount, h_util_ctx_t h_ctx) {
-	util_constant* ae2f_restrict const C = util_mk_constant_node(c_veccount, h_ctx);
-	unless(C) return 0;
-	unless(C->m_key == c_veccount) return 0;
-	unless(C->m_arr128_id && C->m_key > 1)
-		C->m_arr128_id = util_mk_constant_arr128_id(c_veccount, h_ctx);
-
-	if(C->m_struct128_id) return C->m_struct128_id;
-
-	unless((h_ctx->m_count.m_types = emit_opcode(&h_ctx->m_section.m_types
-					, h_ctx->m_count.m_types, SpvOpTypeStruct, 2))) return 0;
-	unless((h_ctx->m_count.m_types = emit_wrd(&h_ctx->m_section.m_types
-					, h_ctx->m_count.m_types, h_ctx->m_id))) return 0;
-	unless((h_ctx->m_count.m_types = emit_wrd(&h_ctx->m_section.m_types
-					, h_ctx->m_count.m_types, C->m_arr128_id))) return 0;
-
-
-
-	unless((h_ctx->m_count.m_decorate = emit_opcode(&h_ctx->m_section.m_decorate
-					, h_ctx->m_count.m_decorate, SpvOpDecorate, 2))) 
-		return 0;
-	unless((h_ctx->m_count.m_decorate = emit_wrd(&h_ctx->m_section.m_decorate
-					, h_ctx->m_count.m_decorate, h_ctx->m_id))) 
-		return 0;
-	unless((h_ctx->m_count.m_decorate = emit_wrd(&h_ctx->m_section.m_decorate
-					, h_ctx->m_count.m_decorate, SpvDecorationBlock))) 
-		return 0;
-
-	/* Member Offset */
-	unless((h_ctx->m_count.m_decorate = emit_opcode(&h_ctx->m_section.m_decorate
-					, h_ctx->m_count.m_decorate, SpvOpMemberDecorate, 4))) return 0;
-	unless((h_ctx->m_count.m_decorate = emit_wrd(&h_ctx->m_section.m_decorate
-					, h_ctx->m_count.m_decorate, h_ctx->m_id))) return 0;
-	unless((h_ctx->m_count.m_decorate = emit_wrd(&h_ctx->m_section.m_decorate
-					, h_ctx->m_count.m_decorate, 0))) return 0;  /** member index 0 */
-	unless((h_ctx->m_count.m_decorate = emit_wrd(&h_ctx->m_section.m_decorate
-					, h_ctx->m_count.m_decorate, SpvDecorationOffset))) return 0;
-	unless((h_ctx->m_count.m_decorate = emit_wrd(&h_ctx->m_section.m_decorate
-					, h_ctx->m_count.m_decorate, 0))) return 0;
-
-	C->m_struct_id = h_ctx->m_id++;
-	return C->m_struct_id;
+	return util_mk_constant_struct_id(c_veccount << 2, h_ctx);
 }
 
 ae2f_inline static aclspv_id_t	util_mk_constant_structpriv_id(const aclspv_wrd_t c_wrdcount, h_util_ctx_t h_ctx) {
 	util_constant* ae2f_restrict const C = util_mk_constant_node(c_wrdcount, h_ctx);
 	unless(C) return 0;
 	unless(C->m_key == c_wrdcount) return 0;
-	unless(C->m_arr32_id && C->m_key > 1)
-		C->m_arr32_id = util_mk_constant_arr32_id(c_wrdcount, h_ctx);
+	unless(C->m_vec32_id)
+		util_mk_constant_vec32_id(c_wrdcount, h_ctx);
 
 	if(C->m_structpriv_id) return C->m_structpriv_id;
 
@@ -426,7 +417,7 @@ ae2f_inline static aclspv_id_t	util_mk_constant_structpriv_id(const aclspv_wrd_t
 	unless((h_ctx->m_count.m_types = emit_wrd(&h_ctx->m_section.m_types
 					, h_ctx->m_count.m_types, h_ctx->m_id))) return 0;
 	unless((h_ctx->m_count.m_types = emit_wrd(&h_ctx->m_section.m_types
-					, h_ctx->m_count.m_types, C->m_arr32_id))) return 0;
+					, h_ctx->m_count.m_types, C->m_vec32_id))) return 0;
 
 	C->m_structpriv_id = h_ctx->m_id++;
 	return C->m_structpriv_id;
