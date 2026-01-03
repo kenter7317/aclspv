@@ -64,17 +64,17 @@ static enum CXChildVisitResult emit_count_fn(CXCursor h_cur, CXCursor h_parent, 
 						, h_ctx->m_count.m_entp
 						, SpvOpEntryPoint, 0)))
 			goto LBL_ABRT;
-		unless((h_ctx->m_count.m_entp = emit_wrd(
+		unless((h_ctx->m_count.m_entp = util_emit_wrd(
 						&h_ctx->m_section.m_entp
 						, h_ctx->m_count.m_entp
 						, SpvExecutionModelGLCompute)))
 			goto LBL_ABRT;
-		unless((h_ctx->m_count.m_entp = emit_wrd(
+		unless((h_ctx->m_count.m_entp = util_emit_wrd(
 						&h_ctx->m_section.m_entp
 						, h_ctx->m_count.m_entp
 						, h_ctx->m_id + h_ctx->m_fnlist.m_num_entp)))
 			goto LBL_ABRT;
-		unless((h_ctx->m_count.m_entp = emit_str(
+		unless((h_ctx->m_count.m_entp = util_emit_str(
 						&h_ctx->m_section.m_entp
 						, h_ctx->m_count.m_entp
 						, NAME.data))) 
@@ -91,27 +91,27 @@ static enum CXChildVisitResult emit_count_fn(CXCursor h_cur, CXCursor h_parent, 
 						, 5)))	
 			goto LBL_ABRT;
 		unless((h_ctx->m_count.m_execmode = 
-					emit_wrd(&h_ctx->m_section.m_execmode
+					util_emit_wrd(&h_ctx->m_section.m_execmode
 						, h_ctx->m_count.m_execmode
 						, h_ctx->m_id + h_ctx->m_fnlist.m_num_entp)))			
 			goto LBL_ABRT;
 		unless((h_ctx->m_count.m_execmode = 
-					emit_wrd(&h_ctx->m_section.m_execmode
+					util_emit_wrd(&h_ctx->m_section.m_execmode
 						, h_ctx->m_count.m_execmode
 						, SpvExecutionModeLocalSize)))
 			goto LBL_ABRT;
 		unless((h_ctx->m_count.m_execmode = 
-					emit_wrd(&h_ctx->m_section.m_execmode
+					util_emit_wrd(&h_ctx->m_section.m_execmode
 						, h_ctx->m_count.m_execmode
 						, XYZ[0])))
 			goto LBL_ABRT;
 		unless((h_ctx->m_count.m_execmode = 
-					emit_wrd(&h_ctx->m_section.m_execmode
+					util_emit_wrd(&h_ctx->m_section.m_execmode
 						, h_ctx->m_count.m_execmode
 						, XYZ[1])))
 			goto LBL_ABRT;
 		unless((h_ctx->m_count.m_execmode = 
-					emit_wrd(&h_ctx->m_section.m_execmode
+					util_emit_wrd(&h_ctx->m_section.m_execmode
 						, h_ctx->m_count.m_execmode
 						, XYZ[2])))
 			goto LBL_ABRT;
@@ -119,8 +119,8 @@ static enum CXChildVisitResult emit_count_fn(CXCursor h_cur, CXCursor h_parent, 
 #if !defined(NDEBUG) || !NDEBUG
 		POS = h_ctx->m_count.m_name;
 		unless((h_ctx->m_count.m_name = emit_opcode(&h_ctx->m_section.m_name, h_ctx->m_count.m_name, SpvOpName, 0)))			goto LBL_ABRT;
-		unless((h_ctx->m_count.m_name = emit_wrd(&h_ctx->m_section.m_name, h_ctx->m_count.m_name, h_ctx->m_id + h_ctx->m_fnlist.m_num_entp)))				goto LBL_ABRT;
-		unless((h_ctx->m_count.m_name = emit_str(&h_ctx->m_section.m_name, h_ctx->m_count.m_name, NAME.data)))	goto LBL_ABRT;
+		unless((h_ctx->m_count.m_name = util_emit_wrd(&h_ctx->m_section.m_name, h_ctx->m_count.m_name, h_ctx->m_id + h_ctx->m_fnlist.m_num_entp)))				goto LBL_ABRT;
+		unless((h_ctx->m_count.m_name = util_emit_str(&h_ctx->m_section.m_name, h_ctx->m_count.m_name, NAME.data)))	goto LBL_ABRT;
 		set_oprnd_count_for_opcode(get_wrd_of_vec(&h_ctx->m_section.m_name)[POS], h_ctx->m_count.m_name - POS - 1);
 #endif
 

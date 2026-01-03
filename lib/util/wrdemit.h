@@ -9,7 +9,6 @@
 
 #include <assert.h>
 #include <string.h>
-#include <stdlib.h>
 
 #include "./ctx.h"
 
@@ -43,7 +42,7 @@ typedef	aclspv_wrdcount_t	spvsz_t;
  * @brief	try emitting `c_wrd` on `h_vec`
  * @return	new c_wrdcount available. 0 when failed allocating.
  * */
-static ae2f_inline spvsz_t emit_wrd(
+static ae2f_inline spvsz_t util_emit_wrd(
 		x_aclspv_vec* ae2f_restrict const h_wrds, 
 		const spvsz_t c_wrdcount, 
 		const aclspv_wrd_t c_wrd
@@ -56,7 +55,7 @@ static ae2f_inline spvsz_t emit_wrd(
 				, ((size_t)count_to_sz((c_wrdcount + 1) << 1))
 				);
 
-	unless(h_wrds->m_p) return 0;
+	ae2f_expected_but_else(h_wrds->m_p) return 0;
 	if(sz_to_count(h_wrds->m_sz) > UINT32_MAX) return 0;
 	if(count_to_sz(c_wrdcount) >= ((spvsz_t)h_wrds->m_sz))
 		return 0;
@@ -75,7 +74,7 @@ static ae2f_inline spvsz_t emit_wrd(
  * @brief	try emit opcode with num_opprm
  * */
 #define	emit_opcode(h_wrds, c_wrdcount, c_opcode, c_num_opprm_opt)	\
-	(emit_wrd(h_wrds, c_wrdcount, opcode_to_wrd(c_opcode, c_num_opprm_opt)))
+	(util_emit_wrd(h_wrds, c_wrdcount, opcode_to_wrd(c_opcode, c_num_opprm_opt)))
 
 #define set_oprnd_count_for_opcode(cr_wrd, c_num_opprm)	\
 	(cr_wrd) = opcode_to_wrd((cr_wrd & ACLSPV_MASK_OPCODE), ((aclspv_num_opprm_t)(c_num_opprm)))
@@ -85,7 +84,7 @@ static ae2f_inline spvsz_t emit_wrd(
  * @brief	emit string with word size padded.
  * @returns	0 when failed.
  * */
-ae2f_inline static spvsz_t emit_str(
+ae2f_inline static spvsz_t util_emit_str(
 		x_aclspv_vec* ae2f_restrict const h_wrds, 
 		const spvsz_t c_wrdcount, 
 		const char* ae2f_restrict const rd_str
@@ -96,12 +95,12 @@ ae2f_inline static spvsz_t emit_str(
 	const spvsz_t	len		= (_len > (size_t)UINT32_MAX) ? 0 : (spvsz_t)_len;
 	const spvsz_t	pad_wrds	= (!!((len) & 3)) + ((len) >> 2);
 
-	unless(len)		return 0;
+	ae2f_expected_but_else(len)		return 0;
 
 	_aclspv_grow_vec_with_copy(_aclspv_malloc, _aclspv_free, _aclspv_memcpy, L_new
 			, *h_wrds, (size_t)count_to_sz(pad_wrds + c_wrdcount));
 
-	unless(h_wrds->m_p)	return 0;
+	ae2f_expected_but_else(h_wrds->m_p)	return 0;
 	assert(count_to_sz(pad_wrds + c_wrdcount) <= (spvsz_t)h_wrds->m_sz);
 
 	memset(&get_wrd_of_vec(h_wrds)[c_wrdcount], 0, (size_t)count_to_sz(pad_wrds));

@@ -1,4 +1,9 @@
-const uint ASDF = 234;
+/** 
+ * This source is test experimental.
+ * extensions will be attributes inside.
+ * 
+ * macros will be defined in opencl-base.h
+ **/
 
 struct STRUCTURE {
 	int aa;
@@ -10,22 +15,33 @@ struct STRUCTURE {
 	int b;
 };
 
+enum {
+	LOCU32_COUNT = 4 
+};
 
-void N_KERNEL_0();
+__constant const int LOCU32_COUNT_0 = 3;
 
-__attribute__((annotate("reqd_work_group_size(2, 2, 2)")))
+
+__attribute__((annotate("reqd_work_group_size(2, 2, 2)"))) /** work group size should be specified on constant time. */
 __kernel void KERNEL_0(
 		       uint pushu32, 
 		       __global uint* __attribute__((annotate("aclspv_set(2)"))) globu32, 
+		       /** 
+		        * spec constant id could & must be specified on use. 
+			* this is one of its declaration: array size specified constant.
+			*/
+		       __local double __attribute__((annotate("aclspv_specid(0)"))) 
+		       locu32_0[LOCU32_COUNT], /** local(workgroup) must be array */
 		       __global float* globf32, 
-		       __local uint* locu32, 
 		       float pushf32, 
 		       struct STRUCTURE push_struct
-		       ) 
-{ 
+		       )
+{
 	globu32[get_global_id(0)] += pushu32 + sin(globf32[get_global_id(0)]); 
 	return;
 }
-__kernel void N_KERNEL_0(__constant int* consti32) {
+
+__kernel void N_KERNEL_0(__constant uintptr_t* consti32, const uint pushu32) {
+	size_t d = 30;
 	return;
 }

@@ -38,7 +38,7 @@ ae2f_inline static e_aclspv_compile_t impl_conf(
 
 	assert((0[(aclspv_wrd_t* ae2f_restrict)h_ctx->m_section.m_capability.m_p] & SpvOpCapability) == SpvOpCapability);
 
-	unless(wrd_caps_count = emit_wrd(&wrd_caps, wrd_caps_count, SpvCapabilityShader))
+	unless(wrd_caps_count = util_emit_wrd(&wrd_caps, wrd_caps_count, SpvCapabilityShader))
 		return ACLSPV_COMPILE_ALLOC_FAILED;
 	assert(wrd_caps.m_p);
 
@@ -47,7 +47,7 @@ ae2f_inline static e_aclspv_compile_t impl_conf(
 	/*** Extension Default **/
 	unless(wrd_ext_count = emit_opcode(&wrd_ext, 0, SpvOpExtension, 0))
 		return ACLSPV_COMPILE_ALLOC_FAILED;
-	unless(wrd_ext_count = emit_str(&wrd_ext, wrd_ext_count, "SPV_KHR_storage_buffer_storage_class"))
+	unless(wrd_ext_count = util_emit_str(&wrd_ext, wrd_ext_count, "SPV_KHR_storage_buffer_storage_class"))
 		return ACLSPV_COMPILE_ALLOC_FAILED;
 
 	set_oprnd_count_for_opcode(get_wrd_of_vec(&wrd_ext)[0], (aclspv_wrd_t)(wrd_ext_count - 1));
@@ -58,13 +58,13 @@ ae2f_inline static e_aclspv_compile_t impl_conf(
 					, 0, SpvOpMemoryModel, 2)))
 		return ACLSPV_COMPILE_ALLOC_FAILED;
 
-	unless((h_ctx->m_count.m_memmodel = emit_wrd(
+	unless((h_ctx->m_count.m_memmodel = util_emit_wrd(
 					&h_ctx->m_section.m_memmodel
 					, h_ctx->m_count.m_memmodel, SpvAddressingModelLogical 
 					)))
 		return ACLSPV_COMPILE_ALLOC_FAILED;
 
-	unless((h_ctx->m_count.m_memmodel = emit_wrd(
+	unless((h_ctx->m_count.m_memmodel = util_emit_wrd(
 					&h_ctx->m_section.m_memmodel
 					, h_ctx->m_count.m_memmodel, SpvMemoryModelGLSL450 
 					)))

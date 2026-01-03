@@ -16,7 +16,7 @@
 
 #include "./emit/count_fn.h"
 #include "./emit/decl_glob_obj.h"
-#include "./emit/body.h"
+#include "./emit/entp_body.h"
 #include "aclspv/spvty.h"
 #include "util/id.h"
 #include "util/iddef.h"
@@ -39,12 +39,15 @@ aclspv_compile(
 	      ) 
 {
 	const CXIndex	CXIDX =	clang_createIndex(0, 0);
-	e_aclspv_compile_t STATE_VAL = ACLSPV_COMPILE_OK;
 	CXTranslationUnit	CXTU = ae2f_NIL;
 	CXCursor		CXROOTCUR;
 
 	enum CXErrorCode	CXERR = CXError_Success;
 	x_aclspv_ctx	CTX;
+
+	unsigned	CXTU_IDX_ERR;
+#define	STATE_VAL	CTX.m_state
+	
 
 
 	assert(rdwr_unsaved);
@@ -53,7 +56,7 @@ aclspv_compile(
 	memset(&CTX, 0, sizeof(CTX));
 	init_scale(&CTX.m_scale_vars, 0);
 
-	unless(CXIDX) {
+	unless(ae2f_expected(CXIDX)) {
 		STATE_VAL = ACLSPV_COMPILE_MET_INVAL;
 		goto LBL_CLEANUP;
 	}
@@ -66,23 +69,54 @@ aclspv_compile(
 			, CXTranslationUnit_None, &CXTU
 			);
 
-	if(CXERR) {
+	CXTU_IDX_ERR = clang_getNumDiagnostics(CXTU);
+	while(ae2f_expected(CXTU_IDX_ERR--)) {
+		const CXDiagnostic DIAG = clang_getDiagnostic(CXTU, CXTU_IDX_ERR);
+		enum CXDiagnosticSeverity SEVERITY = clang_getDiagnosticSeverity(DIAG);
+
+		CXString TXT = clang_formatDiagnostic(DIAG, clang_defaultDiagnosticDisplayOptions());
+
+		puts(TXT.data);
+
+		switch(SEVERITY) {
+			case CXDiagnostic_Note:
+				puts("NOTE");
+				break;
+			case CXDiagnostic_Error:
+				puts("_ERR");
+				break;
+			case CXDiagnostic_Warning:
+				puts("WARN");
+				break;
+			case CXDiagnostic_Ignored:
+				puts("IGNR");
+				break;
+			case CXDiagnostic_Fatal:
+				puts("FTAL");
+				break;
+			default: ae2f_unreachable();
+		}
+
+		clang_disposeString(TXT);
+	}
+
+	if(ae2f_expected_not(CXERR)) {
 		STATE_VAL = ACLSPV_COMPILE_ERR_CLANG;
 		goto LBL_CLEANUP;
 	}
 
-	unless(CXTU) {
+	unless(ae2f_expected(CXTU)) {
 		STATE_VAL = ACLSPV_COMPILE_MET_INVAL;
 		goto LBL_CLEANUP;
 	}
 
-	if((STATE_VAL = impl_conf(&CTX)))
+	if(ae2f_expected_not(STATE_VAL = impl_conf(&CTX)))
 		goto LBL_CLEANUP;
 
 	CXROOTCUR = clang_getTranslationUnitCursor(CXTU);
 
 	clang_visitChildren(CXROOTCUR, emit_count_fn, &CTX);
-	if((STATE_VAL = CTX.m_state))
+	if(ae2f_expected_not(STATE_VAL = CTX.m_state))
 		goto LBL_CLEANUP;
 
 	_aclspv_grow_vec(_aclspv_malloc, _aclspv_free, CTX.m_fnlist.m_entp, (size_t)(sizeof(util_entp_t) * CTX.m_fnlist.m_num_entp));
@@ -101,26 +135,64 @@ aclspv_compile(
 		util_get_default_id(ID_DEFAULT_FN_VOID, &CTX);
 
 
-		while(IDX--) {
+		while(ae2f_expected(IDX--)) {
 			((util_entp_t* ae2f_restrict)CTX.m_fnlist.m_entp.m_p)[IDX].m_id = ANCHOR + IDX;
 		}
 
 		IDX = CTX.m_fnlist.m_num_entp;
 
-		while(IDX--) {
-			CTX.m_tmp.m_w0 = (ID_DEFAULT_FN_VOID);
-			CTX.m_tmp.m_w1 = ((util_entp_t* ae2f_restrict)CTX.m_fnlist.m_entp.m_p)[IDX].m_id;
-			CTX.m_tmp.m_w2 = (ID_DEFAULT_VOID);
-			clang_visitChildren(((util_entp_t* ae2f_restrict)CTX.m_fnlist.m_entp.m_p)[IDX].m_fn, emit_body, &CTX);
+		while(ae2f_expected(IDX--)) {
+#define	FNID ((util_entp_t* ae2f_restrict)CTX.m_fnlist.m_entp.m_p)[IDX].m_id
+
+			STATE_VAL = ACLSPV_COMPILE_ALLOC_FAILED;
+
+			unless(ae2f_expected(CTX.m_count.m_fndef = emit_opcode(
+							&CTX.m_section.m_fndef
+							, CTX.m_count.m_fndef
+							, SpvOpFunction, 4)))
+				goto LBL_CLEANUP;
+			unless(ae2f_expected(CTX.m_count.m_fndef = util_emit_wrd(
+							&CTX.m_section.m_fndef
+							, CTX.m_count.m_fndef
+							, ID_DEFAULT_VOID)))
+				goto LBL_CLEANUP;
+			unless(ae2f_expected(CTX.m_count.m_fndef = util_emit_wrd(
+							&CTX.m_section.m_fndef
+							, CTX.m_count.m_fndef
+							, FNID))) /* funciton id */
+				goto LBL_CLEANUP;
+#undef	FNID
+
+			unless(ae2f_expected(CTX.m_count.m_fndef = util_emit_wrd(
+							&CTX.m_section.m_fndef
+							, CTX.m_count.m_fndef, 
+							0)))
+				goto LBL_CLEANUP;
+			unless(ae2f_expected(CTX.m_count.m_fndef = util_emit_wrd(
+							&CTX.m_section.m_fndef
+							, CTX.m_count.m_fndef
+							, ID_DEFAULT_FN_VOID)))
+				goto LBL_CLEANUP;
+
+			(void)emit_entp_body;
+
+#if 0
+			clang_visitChildren(((util_entp_t* ae2f_restrict)CTX.m_fnlist.m_entp.m_p)[IDX].m_fn
+					, emit_entp_body
+					, &CTX);
+#endif
+
+
+			STATE_VAL = ACLSPV_COMPILE_OK;
 		}
 	}
 
 
-	if((STATE_VAL = CTX.m_state))
+	if(ae2f_expected_not(STATE_VAL = CTX.m_state))
 		goto LBL_CLEANUP;
 
 
-	if((STATE_VAL = impl_asm(&CTX)))
+	if(ae2f_expected_not(STATE_VAL = impl_asm(&CTX)))
 		goto LBL_CLEANUP;
 
 LBL_CLEANUP:
@@ -146,12 +218,12 @@ LBL_CLEANUP:
 	_aclspv_stop_vec(_aclspv_free, CTX.m_section.m_vars);
 
 
-	if(CXIDX) clang_disposeIndex(CXIDX);
-	if(rwr_cxerr_opt) *rwr_cxerr_opt = CXERR;
-	if(rwr_output) *rwr_output = CTX.m_ret.m_p;
+	if(ae2f_expected(CXIDX)) clang_disposeIndex(CXIDX);
+	if(ae2f_expected(rwr_cxerr_opt)) *rwr_cxerr_opt = CXERR;
+	if(ae2f_expected(rwr_output)) *rwr_output = CTX.m_ret.m_p;
 	else free(CTX.m_ret.m_p);
 
-	if(rwr_output_count_opt) *rwr_output_count_opt = CTX.m_retcount;
+	if(ae2f_expected(rwr_output_count_opt)) *rwr_output_count_opt = CTX.m_retcount;
 
 	return STATE_VAL;
 }

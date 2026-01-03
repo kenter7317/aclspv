@@ -37,22 +37,9 @@ ae2f_CoreLibFetchX(ae2f Preproc	main)
 
 ae2f_CoreLibFetchX(KhronosGroup SPIRV-Headers main)
 
-find_package(LLVM)
 find_package(Clang)
 
-message(STATUS ${LLVM_LIBRARY})
 message(STATUS ${Clang_FOUND})
-
-if(LLVM_FOUND)
-	message(STATUS "LLVM is found")
-else()
-	if(NOT EXISTS ${ae2f_CoreScript_Wh})
-		execute_process(
-			COMMAND git clone https://github.com/llvm/llvm-project
-			${ae2f_ProjRoot}/${ae2f_submod}/llvm --depth 1
-			)
-	endif()
-endif()
 
 if(Clang_FOUND)
 	message(STATUS "clang is found")
@@ -63,6 +50,8 @@ else()
 			${ae2f_ProjRoot}/${ae2f_submod}/llvm --depth 1
 			)
 	endif()
+
+	add_subdirectory(${ae2f_ProjRoot}/${ae2f_submod}/llvm ${ae2f_BinRoot}/${ae2f_submod}/llvm)
 endif()
 
 file(GLOB aclspv-inc ${PROJECT_SOURCE_DIR}/inc/*)
@@ -83,6 +72,12 @@ if(NOT ${_aclspv_RELOADED})
 	ae2f_FileRaw_Run_One(
 		${PROJECT_SOURCE_DIR}/src/source.cl 
 		${PROJECT_SOURCE_DIR}/test/lifespan/source.auto.h
+		)
+
+	ae2f_FileRaw_Run_One2(
+		${PROJECT_SOURCE_DIR}/src/ocl.h
+		${PROJECT_SOURCE_DIR}/test/lifespan/ocl.auto.h
+		"B"
 		)
 endif()
 
@@ -110,7 +105,6 @@ ae2f_CoreLibTentConfigCustom(
 target_link_libraries(${ae3f__aclspvABI__TENT} PUBLIC ae3f::aclspvCore)
 target_include_directories(${ae3f__aclspvABI__TENT} PRIVATE lib)
 
-llvm_map_components_to_libnames(LLVM_LIBS LLVMCore)
 target_link_libraries(${ae3f__aclspvABI__TENT} PUBLIC libclang)
 
 ae2f_CoreTestTentVerbose(${ae3f__aclspvABI__TENT} ./test/lifespan)
