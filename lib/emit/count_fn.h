@@ -78,7 +78,7 @@ static enum CXChildVisitResult emit_iter_entry_point(CXCursor h_cur, CXCursor h_
 
 		aclspv_wrdcount_t	POS = CTX->m_count.m_entp;
 		aclspv_wrd_t		IOCOUNT = 0;
-		CTX->m_state = ACLSPV_COMPILE_ALLOC_FAILED;
+		CTX->m_err = ACLSPV_COMPILE_ALLOC_FAILED;
 
 		clang_visitChildren(h_parent, emit_count_fn_execmodel_attr, &EXEC_MODEL);
 
@@ -169,7 +169,7 @@ static enum CXChildVisitResult emit_iter_entry_point(CXCursor h_cur, CXCursor h_
 		unless((CTX->m_count.m_name = util_emit_str(&CTX->m_section.m_name, CTX->m_count.m_name, NAME.data)))	goto LBL_ABRT;
 		set_oprnd_count_for_opcode(get_wrd_of_vec(&CTX->m_section.m_name)[POS], CTX->m_count.m_name - POS - 1);
 #endif
-		CTX->m_state = ACLSPV_COMPILE_OK;
+		CTX->m_err = ACLSPV_COMPILE_OK;
 		++CTX->m_tmp.m_w0;
 
 		clang_disposeString(NAME);

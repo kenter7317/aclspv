@@ -7,8 +7,14 @@
 - `inc` for library header
 - This project compiles the dialect of OpenCL C. For further, see [here](./OpenCL.md)
 
+## How to build
+```sh
+cmake -S. -Bbuild
+cmake --build build
+```
+
 ## language
-- C90 for clang-c
+- ISO C90 with strict rule with libclang
 
 ## license
 - [this project](./LICENSE)

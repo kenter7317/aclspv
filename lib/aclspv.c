@@ -45,7 +45,7 @@ aclspv_compile(
 	x_aclspv_ctx	CTX;
 
 	unsigned	CXTU_IDX_ERR;
-#define	STATE_VAL	CTX.m_state
+#define	STATE_VAL	CTX.m_err
 
 	assert(rdwr_unsaved);
 	assert(rwr_output);
@@ -54,7 +54,7 @@ aclspv_compile(
 	init_scale(&CTX.m_scale_vars, 0);
 
 	unless(ae2f_expected(CXIDX)) {
-		STATE_VAL = ACLSPV_COMPILE_MET_INVAL;
+		CTX.m_err = ACLSPV_COMPILE_MET_INVAL;
 		goto LBL_CLEANUP;
 	}
 
@@ -100,12 +100,12 @@ aclspv_compile(
 	}
 
 	if(ae2f_expected_not(CXERR)) {
-		STATE_VAL = ACLSPV_COMPILE_ERR_CLANG;
+		CTX.m_err = ACLSPV_COMPILE_ERR_CLANG;
 		goto LBL_CLEANUP;
 	}
 
 	unless(ae2f_expected(CXTU)) {
-		STATE_VAL = ACLSPV_COMPILE_MET_INVAL;
+		CTX.m_err = ACLSPV_COMPILE_MET_INVAL;
 		goto LBL_CLEANUP;
 	}
 
@@ -115,7 +115,7 @@ aclspv_compile(
 	CXROOTCUR = clang_getTranslationUnitCursor(CXTU);
 
 	clang_visitChildren(CXROOTCUR, emit_count_fn, &CTX);
-	if(ae2f_expected_not(STATE_VAL = CTX.m_state))
+	if(ae2f_expected_not(STATE_VAL = CTX.m_err))
 		goto LBL_CLEANUP;
 
 	_aclspv_grow_vec(_aclspv_malloc, _aclspv_free, CTX.m_fnlist.m_entp, (size_t)(sizeof(util_entp_t) * CTX.m_fnlist.m_num_entp));
@@ -157,12 +157,12 @@ aclspv_compile(
 
 
 			ae2f_expected_but_else(CTX.m_scale_vars.m_p && FNSCALE) {
-				STATE_VAL = ACLSPV_COMPILE_MET_INVAL;
+				CTX.m_err = ACLSPV_COMPILE_MET_INVAL;
 				goto LBL_CLEANUP;
 			}
 
 
-			STATE_VAL = ACLSPV_COMPILE_ALLOC_FAILED;
+			CTX.m_err = ACLSPV_COMPILE_ALLOC_FAILED;
 			CTX.m_tmp.m_w0 = IDX;
 
 
@@ -225,7 +225,7 @@ aclspv_compile(
 						, CTX.m_count.m_fndef
 						, SpvOpFunctionEnd, 0
 						)) {
-				STATE_VAL = ACLSPV_COMPILE_ALLOC_FAILED;
+				CTX.m_err = ACLSPV_COMPILE_ALLOC_FAILED;
 				goto LBL_CLEANUP;
 			}
 
@@ -235,7 +235,7 @@ aclspv_compile(
 	}
 
 
-	if(ae2f_expected_not(STATE_VAL = CTX.m_state))
+	if(ae2f_expected_not(STATE_VAL = CTX.m_err))
 		goto LBL_CLEANUP;
 
 
@@ -273,5 +273,5 @@ LBL_CLEANUP:
 
 	if(ae2f_expected(rwr_output_count_opt)) *rwr_output_count_opt = CTX.m_num_ret;
 
-	return STATE_VAL;
+	return CTX.m_err;
 }

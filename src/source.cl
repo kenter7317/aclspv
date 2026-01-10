@@ -55,8 +55,8 @@ __kernel void N_KERNEL_0(__constant uintptr_t* consti32, __attribute__((annotate
 	const size_t specid_0 __attribute__((annotate("aclspv_specid(0)"))) = 0;
 	const size_t specid_1 __attribute__((annotate("aclspv_specid(1)"))) = 1;
 	{int a, b;
-	a = specid_1 + specid_0 + pushu32;
-	b = (1 ? specid_1 + specid_0 + pushu32 : 3);}
+	a = specid_1 + specid_0 + u32out[0];
+	b = (1 ? specid_1 + specid_0 + u32out[0] : 3);}
 
 	goto AGOTO;
 AGOTO:
@@ -68,6 +68,7 @@ kernel void do_none(void)
     size_t g = get_global_id(0);
 }
 
+#if 0
 kernel void do_add_sub(__global short4 *add_out, __global short4 *sub_out,
                        __global short4 *x, __global short4 *y)
 {
@@ -75,3 +76,4 @@ kernel void do_add_sub(__global short4 *add_out, __global short4 *sub_out,
     add_out[g] = x[g] + y[g];
     sub_out[g] = x[g] - y[g];
 }
+#endif

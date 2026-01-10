@@ -20,7 +20,7 @@ typedef struct a_aclspv_ctx {
 	 * */
 	aclspv_wrd_t		m_is_logical : 1;
 
-	e_aclspv_compile_t	m_state;
+	e_aclspv_compile_t	m_err;
 
 	/**
 	 * @var		m_ret
