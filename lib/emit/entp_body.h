@@ -182,29 +182,6 @@ static enum CXChildVisitResult emit_entp_body(CXCursor h_cur, CXCursor h_parent,
 						break;
 				}
 
-				unless(CURSOR.m_data.m_var_simple.m_fits_64bit) {
-					intmax_t	SIZEOF = clang_Type_getSizeOf(TYPE);
-					aclspv_wrd_t	WRDCOUNT = SIZEOF > 0 && SIZEOF < UINT32_MAX
-						? (((aclspv_wrd_t)SIZEOF + 3) >> 2) : 0;
-
-					ae2f_expected_but_else(WRDCOUNT) jmpfail(ACLSPV_COMPILE_MET_INVAL);
-
-					ae2f_expected_but_else(util_mk_constant_arr32_id(WRDCOUNT, CTX))
-						goto LBL_FAIL;
-
-					ae2f_expected_but_else(CTX->m_count.m_fndef = util_emitx_variable(
-								&CTX->m_section.m_fndef
-								, CTX->m_count.m_fndef
-								, util_mk_constant_arr32_id(WRDCOUNT, CTX)
-								, CTX->m_id, SpvStorageClassFunction))
-						goto LBL_FAIL;
-
-					CURSOR.m_data.m_var_simple.m_id = CTX->m_id++;
-
-					/** TODO: variable initialiser */
-					goto LBL_DONE;
-				}
-
 				ae2f_expected_but_else(TYPE_ID)
 					goto LBL_FAIL;
 
