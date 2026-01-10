@@ -69,10 +69,21 @@ typedef struct a_aclspv_ctx {
 	 * cache for cursors for parsing one function 
 	 * for its use see util/cursor.h
 	 *
+	 * [util_cursor]
+	 *
 	 * @details
 	 * reset on every function
 	 * */
 	x_aclspv_vec		m_cursors;
+
+	/** 
+	 * @brief
+	 * cache for complex types which needs to be stored somewhere
+	 * for its use see util/type_unique.h
+	 *
+	 * [util_type_unique]
+	 * */
+	x_aclspv_vec		m_type_uniques;
 
 	struct {
 		aclspv_wrd_t	m_w0;
