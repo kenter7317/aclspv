@@ -778,12 +778,12 @@ static enum CXChildVisitResult emit_expr(
 
 				ae2f_expected_but_else(STCK_COUNT = util_emit_wrd(
 							&STCK, (aclspv_wrd_t)STCK_COUNT + 1
-							, OPRNDS[1])) {
+							, OPRNDS[0])) {
 					CTX->m_err = ACLSPV_COMPILE_ALLOC_FAILED;
 					return CXChildVisit_Break;
 				}
 
-				get_wrd_of_vec(&STCK)[STCK_COUNT - 2] = OPRNDS[0];
+				get_wrd_of_vec(&STCK)[STCK_COUNT - 2] = OPRNDS[1];
 
 
 				ae2f_fallthrough;

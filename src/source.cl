@@ -64,13 +64,11 @@ __kernel void N_KERNEL_0(__constant uintptr_t* consti32, __attribute__((annotate
 	a;
 	3 + 4 + 3;
 
-	#if 1
 	a + 3;
 	a + 4.0 + 3;
 
 	b;
 	b + 3;
-	#endif
 
 	goto AGOTO;
 AGOTO:
