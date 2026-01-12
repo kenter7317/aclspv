@@ -44,7 +44,7 @@ message(STATUS ${Clang_FOUND})
 if(Clang_FOUND)
 	message(STATUS "clang is found")
 else()
-	if(NOT EXISTS ${ae2f_CoreScript_Wh})
+	if(NOT EXISTS ${ae2f_CoreScript_Wh}/llvm)
 		execute_process(
 			COMMAND git clone https://github.com/llvm/llvm-project
 			${ae2f_ProjRoot}/${ae2f_submod}/llvm --depth 1
