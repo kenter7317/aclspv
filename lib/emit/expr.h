@@ -1,3 +1,5 @@
+/** @file expr.h */
+
 #ifndef	lib_emit_expr_h
 #define	lib_emit_expr_h
 

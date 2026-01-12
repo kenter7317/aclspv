@@ -1,3 +1,5 @@
+/** @file specid.h */
+
 #ifndef lib_attr_specid_h
 #define lib_attr_specid_h
 

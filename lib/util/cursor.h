@@ -1,3 +1,5 @@
+/** @file cursor.h @brief cursor master list */
+
 #ifndef util_cursor_h
 #define util_cursor_h
 

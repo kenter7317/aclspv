@@ -1,3 +1,5 @@
+/** @file bind.h */
+
 #ifndef util_bind_h
 #define util_bind_h
 

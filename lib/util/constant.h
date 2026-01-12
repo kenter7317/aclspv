@@ -1,3 +1,5 @@
+/** @file constant.h */
+
 #ifndef	lib_build_constant_h
 #define lib_build_constant_h
 

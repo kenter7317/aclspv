@@ -1,3 +1,5 @@
+/** @file entp_body.h */
+
 #ifndef	lib_emit_entp_body_h
 #define	lib_emit_entp_body_h
 

@@ -1,3 +1,5 @@
+/** @file id.h @brief utility functions for id.h */
+
 #ifndef	util_iddef_h
 #define util_iddef_h
 

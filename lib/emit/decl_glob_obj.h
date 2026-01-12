@@ -1,3 +1,5 @@
+/** @file decl_glob_obj.h */
+
 #include "aclspv/spvty.h"
 #include <assert.h>
 #include <string.h>

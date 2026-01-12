@@ -1,3 +1,5 @@
+/** @file is_kernel.h @brief find if function is entry point or not */
+
 #ifndef util_is_kernel_h
 #define util_is_kernel_h
 

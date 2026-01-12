@@ -1,3 +1,5 @@
+/** @file type_unique.h */
+
 #ifndef util_type_unique_h
 #define util_type_unique_h
 

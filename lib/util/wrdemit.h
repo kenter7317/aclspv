@@ -1,3 +1,5 @@
+/** @file wrdemit.h @brief word emission utilities */
+
 #ifndef build_wrdemit_h
 #define build_wrdemit_h
 

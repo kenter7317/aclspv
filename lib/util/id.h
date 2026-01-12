@@ -1,3 +1,5 @@
+/** @file id.h @brief default ids which could be specialised. */
+
 #ifndef __lib_build_id
 #define __lib_build_id
 

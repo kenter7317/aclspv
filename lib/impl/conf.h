@@ -1,3 +1,4 @@
+/** @file conf.h @brief bootstrap the compiler state machine */
 
 #include <util/emitx.h>
 #include <util/id.h>

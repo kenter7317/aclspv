@@ -1,3 +1,8 @@
+/** 
+ * @file	location.h 
+ * @brief	location attribute detector
+ * */
+
 #ifndef lib_attr_location_h
 #define lib_attr_location_h
 

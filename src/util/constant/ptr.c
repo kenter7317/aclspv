@@ -1,3 +1,5 @@
+/** @file ptr.auto.h @brief pointer emission utility */
+
 #ifndef constant_ptr_auto_h
 #define constant_ptr_auto_h
 

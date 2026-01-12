@@ -1,3 +1,4 @@
+/** @file asm.h @brief finalise the emission */
 
 #include <spirv/unified1/spirv.h>
 #include <aclspv.h>

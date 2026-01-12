@@ -1,3 +1,5 @@
+/** @file entp.h */
+
 #ifndef __lib_build_entp
 #define __lib_build_entp
 

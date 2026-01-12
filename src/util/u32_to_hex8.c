@@ -1,3 +1,5 @@
+/** @file u32_to_hex8.auto.h */
+
 #ifndef util_u32_to_hex8_h
 #define util_u32_to_hex8_h
 

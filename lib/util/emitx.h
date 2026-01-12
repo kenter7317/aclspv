@@ -1,3 +1,5 @@
+/** @file emitx.h @brief advanced emission */
+
 #ifndef lib_util_emitx
 #define lib_util_emitx
 

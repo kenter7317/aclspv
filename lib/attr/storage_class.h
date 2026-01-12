@@ -1,3 +1,5 @@
+/** @file storage_class.h */
+
 #ifndef lib_attr_storage_class_h
 #define lib_attr_storage_class_h
 
