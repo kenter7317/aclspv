@@ -47,11 +47,11 @@ else()
 	if(NOT EXISTS ${ae2f_CoreScript_Wh}/llvm)
 		execute_process(
 			COMMAND git clone https://github.com/llvm/llvm-project
-			${ae2f_ProjRoot}/${ae2f_submod}/llvm --depth 1
+			${ae2f_CoreScript_Wh}/llvm --depth 1
 			)
 	endif()
 
-	add_subdirectory(${ae2f_ProjRoot}/${ae2f_submod}/llvm ${ae2f_BinRoot}/${ae2f_submod}/llvm)
+	add_subdirectory(${ae2f_CoreScript_Wh}/llvm/clang ${ae2f_BinRoot}/${ae2f_submod}/clang)
 endif()
 
 file(GLOB aclspv-inc ${PROJECT_SOURCE_DIR}/inc/*)
