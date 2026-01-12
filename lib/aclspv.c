@@ -297,7 +297,7 @@ LBL_CLEANUP:
 
 	if(ae2f_expected(CXIDX)) clang_disposeIndex(CXIDX);
 	if(ae2f_expected(rwr_cxerr_opt)) *rwr_cxerr_opt = CXERR;
-	if(ae2f_expected(rwr_output)) *rwr_output = CTX.m_ret.m_p;
+	if((rwr_output)) *rwr_output = CTX.m_ret.m_p;
 	else free(CTX.m_ret.m_p);
 
 	if(ae2f_expected(rwr_output_count_opt)) *rwr_output_count_opt = CTX.m_num_ret;

@@ -706,17 +706,50 @@ static enum CXChildVisitResult emit_expr(
 					|= LST_SCALE_BUF[1];
 
 				if(LST_SCALE_BUF[1]) {
-					(void)LST_SCALE_BUF[2]; /** OpSpecConstant */
+#define	XORSWAP(a, b)	(a) ^= (b); (b) ^= (a); (a) ^= (b);
+					/** 
+					 * here, operation is not constant.
+					 *
+					 * current
+					 * [2] OpSpecConstant opcode (ignorance required)
+					 * [3] result type
+					 * [4] result id
+					 * [5] literal opcode (opspecconstant evaluation)
+					 * ...
+					 *
+					 *
+					 * we want
+					 * [3] opcode with operand count
+					 * [4] result type
+					 * [5] result id
+					 * */
+					(void)LST_SCALE_BUF[2];
 
-					LST_SCALE_BUF[3] ^= LST_SCALE_BUF[5];
-					LST_SCALE_BUF[5] ^= LST_SCALE_BUF[3];
-					LST_SCALE_BUF[3] ^= LST_SCALE_BUF[5]; /** swap */
+					/** 
+					 * swap [3] and [5]
+					 *
+					 * after this will
+					 * [3] literal opcode (without operand)
+					 * [4] result id
+					 * [5] result type
+					 * * */
+					XORSWAP(LST_SCALE_BUF[3], LST_SCALE_BUF[5]);
 
+					/** we have four operands (including opcode) */
 					LST_SCALE_BUF[3] |= mk_noprnds(4);
 
-					LST_SCALE_BUF[4] ^= LST_SCALE_BUF[5];
-					LST_SCALE_BUF[5] ^= LST_SCALE_BUF[4];
-					LST_SCALE_BUF[4] ^= LST_SCALE_BUF[5]; /** swap */
+					/**
+					 * swap [4] and [5].
+					 *
+					 * after this will
+					 * [3] opcode
+					 * [4] result type
+					 * [5] result id
+					 *
+					 * that matches what we want.
+					 * */
+					XORSWAP(LST_SCALE_BUF[4], LST_SCALE_BUF[5]);
+#undef	XORSWAP
 				}
 
 #define		TMPL_SECTION	(*(IS_NOT_CONSTANT ? &CTX->m_section.m_fnimpl	: &CTX->m_section.m_types))
